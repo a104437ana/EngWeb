@@ -1,0 +1,54 @@
+var jwt = require('jsonwebtoken')
+
+module.exports.validate = (req, res, next) => {
+    var token = req.query.token || req.body.token || req.get('Authorization')
+    if (token) {
+        jwt.verify(token, "EngWeb2025", (err, payload) => {
+            if (err) res.status(401).jsonp(err)
+            else next()
+        })
+    }
+    else res.status(401).jsonp({ error: "Token inexistente" })
+}
+
+module.exports.validateProdutor = (req, res, next) => {
+    var token = req.query.token || req.body.token || req.get('Authorization')
+    if (token) {
+        jwt.verify(token, "EngWeb2025", (err, payload) => {
+            if (err) res.status(401).jsonp(err)
+            else {
+                if (payload.level == "PRODUTOR") next()
+                else res.status(401).jsonp({ error: "Utilizador sem permissão para aceder ao conteúdo" })
+            }
+        })
+    }
+    else res.status(401).jsonp({ error: "Token inexistente" })
+}
+
+module.exports.validateAdministrador = (req, res, next) => {
+    var token = req.query.token || req.body.token || req.get('Authorization')
+    if (token) {
+        jwt.verify(token, "EngWeb2025", (err, payload) => {
+            if (err) res.status(401).jsonp(err)
+            else {
+                if (payload.level == "ADMINISTRADOR") next()
+                else res.status(401).jsonp({ error: "Utilizador sem permissão para aceder ao conteúdo" })
+            }
+        })
+    }
+    else res.status(401).jsonp({ error: "Token inexistente" })
+}
+
+module.exports.validateConsumidor = (req, res, next) => {
+    var token = req.query.token || req.body.token || req.get('Authorization')
+    if (token) {
+        jwt.verify(token, "EngWeb2025", (err, payload) => {
+            if (err) res.status(401).jsonp(err)
+            else {
+                if (payload.level == "CONSUMIDOR") next()
+                else res.status(401).jsonp({ error: "Utilizador sem permissão para aceder ao conteúdo" })
+            }
+        })
+    }
+    else res.status(401).jsonp({ error: "Token inexistente" })
+}
