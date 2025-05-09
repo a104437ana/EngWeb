@@ -2,7 +2,36 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/w3.css')
     link(rel='icon', type='image/png', href='/images/eu_digital.png')
+    meta(charset='utf-8')
   body
-    block content
+    header.w3-bar.w3-light-blue.w3-border-light-blue
+      h1
+        span.w3-bar-item.w3-left
+          a(href='/')
+            img(src='/images/eu_digital.png', width='50')
+        span.w3-bar-item.w3-left= title
+        span.w3-bar-item.w3-right
+          a(href='/')
+            img(src='/images/logout.png', width='50')
+    main
+      block content
+    footer.w3-container.w3-light-blue.w3-bottom
+      address.w3-bar.w3-center
+        span.w3-bar-item © 
+          a(href="https://epl.di.uminho.pt/~jcr/AULAS/EngWeb2025/") Engenharia Web
+        span.w3-bar-item Desenvolvido pela equipa BUGBUSTERS (
+          a(href="https://github.com/a104437ana") Ana Sá Oliveira
+          span  , 
+          a(href="https://github.com/a104263") Inês Silva Marques
+          span  e 
+          a(href="https://github.com/rafael-vilasboas") José Rafael de Oliveira Vilas Boas
+          span )
+        span.w3-bar-item Interface com  
+          a(href="https://www.w3schools.com/w3css/default.asp") w3.css
+        span.w3-bar-item Autenticação com 
+          a(href="https://www.passportjs.org/") passport
+        span.w3-bar-item Gerado em 
+          span=date
+
