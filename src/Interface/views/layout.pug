@@ -7,13 +7,19 @@ html
     meta(charset='utf-8')
   body
     header
-      nav.w3-bar.w3-light-blue.w3-padding-10.w3-center
-        a.w3-bar-item.w3-left(href="#")
+      nav.w3-bar.w3-light-blue.w3-center
+        a.w3-bar-item.w3-left(href="/")
           img(src="/images/eu_digital.png", style="height:70px;", alt="Home")
         h1
-          .w3-bar-item.w3-left O meu eu digital
-        a.w3-bar-item.w3-right(href="#")
-          img(src="/images/logout.png", style="height:50px;", alt="Sair")
+          .w3-bar-item.w3-left 
+        a.w3-bar-item.w3-right.w3-hover-text-white(href="/signup", style="text-decoration: none;")
+          img(src="/images/signup.png", style="height:50px;", alt="Sair")
+          span
+            b Sign up
+        a.w3-bar-item.w3-right.w3-hover-text-white(href="/login", style="text-decoration: none;")
+          img(src="/images/login.png", style="height:50px;", alt="Sair")
+          span 
+            b Log in
     main
       block content
     footer.w3-container.w3-light-blue.w3-bottom
