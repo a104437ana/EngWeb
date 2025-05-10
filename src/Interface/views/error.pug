@@ -1,6 +1,9 @@
 extends layout
 
 block content
-  h1= message
-  h2= error.status
-  pre #{error.stack}
+  .w3-container.w3-padding-16
+    h1
+      b= message
+    h2
+      b= error.status
+    pre #{error.stack}

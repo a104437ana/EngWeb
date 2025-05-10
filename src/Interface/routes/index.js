@@ -9,17 +9,17 @@ router.get('/', function(req, res, next) {
 
 router.get('/home', function(req, res, next) {
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
-  res.render('home',{title: "I am ... (in bits and bytes)", date: date});
+  res.render('home',{title: "I am ... (in bits and bytes)", date: date,role:"cons"});
 });
 
 router.get('/login', function(req, res, next) {
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
-  res.render('login',{title: "Erro", date: date});
+  res.render('login',{title: "Log in", date: date});
 });
 
 router.get('/signup', function(req, res, next) {
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
-  res.render('signup',{title: "Erro", date: date});
+  res.render('signup',{title: "Sign up", date: date});
 });
 
 module.exports = router;
