@@ -12,6 +12,31 @@ router.get('/home', function(req, res, next) {
   res.render('home',{title: "I am ... (in bits and bytes)", date: date,role:"cons"});
 });
 
+router.get('/users', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  res.render('users',{title: "Utilizadores", date: date,role:"admin"});
+});
+
+router.get('/recursos', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  res.render('recursos',{title: "Recursos", date: date,role:"admin"});
+});
+
+router.get('/stats', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  res.render('stats',{title: "Estatísticas", date: date,role:"admin"});
+});
+
+router.get('/news', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  res.render('news',{title: "Notícias", date: date,role:"admin"});
+});
+
+router.get('/diary', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  res.render('diary',{title: "O Meu Diário", date: date,role:"cons"});
+});
+
 router.get('/login', function(req, res, next) {
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
   res.render('login',{title: "Log in", date: date});

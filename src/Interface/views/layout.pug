@@ -5,15 +5,50 @@ html
     link(rel='stylesheet', href='/stylesheets/w3.css')
     link(rel='icon', type='image/png', href='/images/eu_digital.png')
     meta(charset='utf-8')
-  body.w3-light-grey
+  body.w3-light-grey(style="min-height: 100vh; display: flex; flex-direction: column;")
     header
-      if role === "cons"
+      if role === "admin"
         nav.w3-bar.w3-light-blue.w3-center
           a.w3-bar-item.w3-left.w3-hover-text-white(href="/",, style="text-decoration: none;")
-            img(src="/images/eu_digital.png", style="height:70px;", alt="Home")
+            img(src="/images/eu_digital.png", style="height:70px;" )
             span 
               b O Meu Eu Digital
           h1
+          a.w3-bar-item.w3-left.w3-hover-text-white(href="/users",, style="text-decoration: none;")
+            img(src="/images/users.png", style="height:50px;" )
+            span 
+              b Utilizadores
+          a.w3-bar-item.w3-left.w3-hover-text-white(href="/recursos",, style="text-decoration: none;")
+            img(src="/images/re.png", style="height:50px;" )
+            span 
+              b Recursos
+          a.w3-bar-item.w3-left.w3-hover-text-white(href="/news",, style="text-decoration: none;")
+            img(src="/images/news.png", style="height:50px;" )
+            span 
+              b Notícias
+          a.w3-bar-item.w3-left.w3-hover-text-white(href="/stats",, style="text-decoration: none;")
+            img(src="/images/stats.png", style="height:50px;" )
+            span 
+              b Estatísticas
+          a.w3-bar-item.w3-right.w3-hover-text-white(href="/login", style="text-decoration: none;")
+            img(src="/images/logout.png", style="height:50px;", alt="Sair")
+            span 
+              b Log out
+          a.w3-bar-item.w3-right.w3-hover-text-white(href="/login", style="text-decoration: none;")
+            img(src="/images/user.png", style="height:50px;", alt="Sair")
+            span 
+              b Ana Sá Oliveira
+      else if role === "cons"
+        nav.w3-bar.w3-light-blue.w3-center
+          a.w3-bar-item.w3-left.w3-hover-text-white(href="/",, style="text-decoration: none;")
+            img(src="/images/eu_digital.png", style="height:70px;" )
+            span 
+              b O Meu Eu Digital
+          h1
+          a.w3-bar-item.w3-left.w3-hover-text-white(href="/diary",, style="text-decoration: none;")
+            img(src="/images/diary.png", style="height:50px;" )
+            span 
+              b  O Meu Diário
           a.w3-bar-item.w3-right.w3-hover-text-white(href="/login", style="text-decoration: none;")
             img(src="/images/logout.png", style="height:50px;", alt="Sair")
             span 
@@ -25,7 +60,7 @@ html
       else
         nav.w3-bar.w3-light-blue.w3-center
           a.w3-bar-item.w3-left.w3-hover-text-white(href="/",, style="text-decoration: none;")
-            img(src="/images/eu_digital.png", style="height:70px;", alt="Home")
+            img(src="/images/eu_digital.png", style="height:70px;" )
             span 
               b O Meu Eu Digital
           h1
@@ -37,9 +72,9 @@ html
             img(src="/images/login.png", style="height:50px;", alt="Sair")
             span 
               b Log in
-    main
+    main(style="flex-grow: 1;")
       block content
-    footer.w3-container.w3-light-blue.w3-bottom
+    footer.w3-container.w3-light-blue
       address.w3-bar.w3-center
         span.w3-bar-item © 
           a(href="https://epl.di.uminho.pt/~jcr/AULAS/EngWeb2025/") Engenharia Web
