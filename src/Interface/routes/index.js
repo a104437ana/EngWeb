@@ -37,6 +37,11 @@ router.get('/diary', function(req, res, next) {
   res.render('diary',{title: "O Meu Diário", date: date,role:"cons"});
 });
 
+router.get('/registar', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  res.render('registar',{title: "Adicionar Item", date: date,role:"cons"});
+});
+
 router.get('/login', function(req, res, next) {
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
   res.render('login',{title: "Log in", date: date});
