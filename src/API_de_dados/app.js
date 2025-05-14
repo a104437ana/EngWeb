@@ -5,14 +5,12 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose')
 
-var mongoDB = 'mongodb://localhost:27017/entregas'
+var mongoDB = 'mongodb://localhost:27017/project_backend'
 mongoose.connect(mongoDB)
 var connection = mongoose.connection
 connection.on('error', console.error.bind(console, 'Erro na conexão ao MongoDB'))
 connection.once('open', () => console.log('Conexão ao MongoDB realizada com sucesso'))
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var uploadRouter = require('./routes/upload');
 
 var app = express();
@@ -27,8 +25,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/upload', uploadRouter);
 
 // catch 404 and forward to error handler

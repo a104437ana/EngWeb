@@ -1,7 +1,12 @@
 var mongoose = require('mongoose')
 
 var uploadSchema = new mongoose.Schema({
-    _id : String
+    path : String,
+    upload_date : Date,
+    uploaded_by : String,
+    public : Boolean,
+    description : String,
+    files : [String]
 }, {versionKey : false})
 
 module.exports = mongoose.model('upload', uploadSchema)
