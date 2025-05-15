@@ -6,8 +6,12 @@ var multer = require('multer')
 var fs = require('fs')
 var jszip = require('jszip')
 var xml2js = require('xml2js')
+var path = require('path');
+const Auth = require('../auth/auth')
 
 var upload = multer({dest: 'upload/'})
+
+var logStream = fs.createWriteStream(path.join(__dirname, '/../', 'logs.txt'), { flags: 'a' })
 
 async function readManifest(zipPath){
   try{
@@ -97,27 +101,15 @@ async function saveZipFiles(zip, manifest, zipFolderPath, outputFolderPath) {
   }
 }
 
-router.get('/', function(req, res, next) {
-  Upload.findAll()
-    .then(data => res.status(200).jsonp(data))
-    .catch(err => res.status(500).jsonp(err))
-});
-
-router.get('/:id', function(req, res, next) {
-  Upload.findById(req.params.id)
-    .then(data => res.status(200).jsonp(data))
-    .catch(err => res.status(500).jsonp(err))
-});
-
-router.post('/', upload.single('file'), async function(req, res, next) {
+router.post('/', upload.single('file'), Auth.validate, async function(req, res, next) {
   try {
     const { zip, manifestData } = await readManifest(req.file.path);
     await checkManifestFolder(zip, manifestData, "SIP");
     const file_ids = await saveMetadata(zip, manifestData, __dirname + '/../public/fileStore/');
     var upload = {
       path : __dirname + '/../public/fileStore/' + manifestData.folder_name + '/',
-      upload_date : new Date(),
-      uploaded_by : manifestData.user,
+      upload_date : new Date().toISOString(),
+      uploaded_by : req.user,
       public : manifestData.public,
       description : manifestData.description,
       files : file_ids
@@ -126,6 +118,7 @@ router.post('/', upload.single('file'), async function(req, res, next) {
     const baseZipPath = 'SIP'; 
     const baseOutputPath = __dirname + '/../public/fileStore/';
     await saveZipFiles(zip, manifestData, baseZipPath, baseOutputPath);
+    logStream.write(`${data.upload_date.toISOString()}:\n Upload ${data._id} realizado pelo utilizador ${data.uploaded_by}, ficheiros guardados em ${data.path}\n`)
     return res.status(201).jsonp(data)
   }
   catch (error) {
@@ -133,16 +126,16 @@ router.post('/', upload.single('file'), async function(req, res, next) {
   }
 });
 
-router.put('/:id', function(req, res, next) {
-  Upload.update(req.params.id, req.body)
-    .then(data => res.status(200).jsonp(data))
-    .catch(err => res.status(500).jsonp(err))
-});
-
-router.delete('/:id', function(req, res, next) {
-  Upload.delete(req.params.id, req.body.justificacao)
-    .then(data => res.status(200).jsonp(data))
-    .catch(err => res.status(500).jsonp(err)) 
+router.delete('/:id', Auth.validateChangeUpload, async function(req, res, next) {
+  try {
+    const upload = await Upload.delete(req.params.id);
+    await fs.promises.rm(upload.path, { recursive: true , force : true})
+    logStream.write(`${upload.upload_date.toISOString()}:\n Upload ${upload._id} apagado pelo utilizador ${req.user}\n`)
+    return res.status(200).jsonp(upload)
+  }
+  catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = router;

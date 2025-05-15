@@ -21,4 +21,5 @@ module.exports.delete = async (id) => {
     var upload = await Upload
         .findByIdAndDelete(id, {new : true})
         .exec()
+    return upload;
 }
