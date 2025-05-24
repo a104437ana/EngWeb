@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const {v4 : uuidv4} = require('uuid')
+var session = require('express-session')
 
 var mongoose = require('mongoose');
 var passport = require('passport');
@@ -23,6 +25,15 @@ passport.deserializeUser(User.deserializeUser());
 var usersRouter = require('./routes/users');
 
 var app = express();
+
+app.use(session({
+  genid: req => {
+    return uuidv4()
+  },
+  secret : 'EngWeb2025',
+  resave: false,
+  saveUninitialized: true
+}))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

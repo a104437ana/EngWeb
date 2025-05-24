@@ -47,3 +47,34 @@ module.exports.validateChangeUpload = (req, res, next) => {
         res.status(401).jsonp({error : "Token inexistente"})
     }
 }
+
+module.exports.validateGetUserDiary = (req, res, next) => {
+    var token = req.query.token || req.body.token || req.get('Authorization')
+    if(token){
+        jwt.verify(token, "EngWeb2025", (err, payload) => {
+            if(err) res.status(401).jsonp(err)
+            else{
+                const diary = Upload.hasUploads(req.params.id);
+                if(diary==true){
+                    if(payload.level == "ADMIN"){
+                        req.level = "ADMIN"
+                        req.user = payload.user
+                        next()
+                    }
+                    else{
+                        req.level = "USER"
+                        req.user = payload.user
+                        next()
+                    }
+                }
+                else{
+                    res.status(404).jsonp({error : "Diário não existe"})
+                }
+            }
+        })
+    }
+    else{
+        req.level = "PUBLIC"
+        next()
+    }
+}

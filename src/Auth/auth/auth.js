@@ -11,41 +11,26 @@ module.exports.validate = (req, res, next) => {
     else res.status(401).jsonp({ error: "Token inexistente" })
 }
 
-module.exports.validateProdutor = (req, res, next) => {
+module.exports.validateUtilizador = (req, res, next) => {
     var token = req.query.token || req.body.token || req.get('Authorization')
     if (token) {
         jwt.verify(token, "EngWeb2025", (err, payload) => {
             if (err) res.status(401).jsonp(err)
             else {
-                if (payload.level == "PRODUTOR") next()
-                else res.status(401).jsonp({ error: "Utilizador sem permissão para aceder ao conteúdo" })
+                next();
             }
         })
     }
     else res.status(401).jsonp({ error: "Token inexistente" })
 }
 
-module.exports.validateAdministrador = (req, res, next) => {
+module.exports.validateAdmin = (req, res, next) => {
     var token = req.query.token || req.body.token || req.get('Authorization')
     if (token) {
         jwt.verify(token, "EngWeb2025", (err, payload) => {
             if (err) res.status(401).jsonp(err)
             else {
-                if (payload.level == "ADMINISTRADOR") next()
-                else res.status(401).jsonp({ error: "Utilizador sem permissão para aceder ao conteúdo" })
-            }
-        })
-    }
-    else res.status(401).jsonp({ error: "Token inexistente" })
-}
-
-module.exports.validateConsumidor = (req, res, next) => {
-    var token = req.query.token || req.body.token || req.get('Authorization')
-    if (token) {
-        jwt.verify(token, "EngWeb2025", (err, payload) => {
-            if (err) res.status(401).jsonp(err)
-            else {
-                if (payload.level == "CONSUMIDOR") next()
+                if (payload.level == 1) next()
                 else res.status(401).jsonp({ error: "Utilizador sem permissão para aceder ao conteúdo" })
             }
         })

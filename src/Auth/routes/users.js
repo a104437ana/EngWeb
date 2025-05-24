@@ -7,41 +7,35 @@ var Auth = require('../auth/auth')
 
 var User = require('../controllers/user')
 
-router.get('/', Auth.validateAdministrador, function(req, res) {
+router.get('/', Auth.validateAdmin, function(req, res) {
   User.list()
     .then(data => res.status(200).jsonp({ data: data }))
     .catch(err => res.status(500).jsonp({ error: err }))
 });
 
-router.get('/:id', Auth.validateAdministrador, function(req, res) {
+router.get('/:id', Auth.validateAdmin, function(req, res) {
   User.getUser(req.params.id)
     .then(data => res.status(200).jsonp({ data: data }))
     .catch(err => res.status(500).jsonp({ error: err }))
 });
 
-router.post('/', Auth.validateAdministrador, function(req, res) {
-  User.addUser(req.body)
-    .then(data => res.status(201).jsonp({ data: data }))
-    .catch(err => res.status(500).jsonp({ error: err }))
-});
-
-router.post('/register', Auth.validateAdministrador, function(req, res) {
+router.post('/', function(req, res) {
   var date = new Date().toISOString().substring(0, 19)
   userModel.register(new userModel({
       username: req.body.username,
       name: req.body.name,
-      level: req.body.level,
+      level: 0,
       active: true,
       dateCreated: date
     }),
     req.body.password,
     (err, user) => {
-      if (err) res.jsonp({ error: err, message: `Register error: ${err}` })
+      if (err) res.status(500).jsonp({ error: `Erro no registo: ${err}`})
       else {
         passport.authenticate("local")(req, res, () => {
           jwt.sign({
-            username: req.user.username,
-            level: req.user.level,
+            username: user.username,
+            level: user.level,
             sub: "Projeto EngWeb2025" // para tirar
           },
           "EngWeb2025",
@@ -69,31 +63,31 @@ router.post('/login', passport.authenticate('local'), function(req, res) {
   })
 });
 
-router.put('/:id', Auth.validateAdministrador, function(req, res) {
+router.put('/:id', Auth.validateAdmin, function(req, res) {
   User.updateUser(req.params.id, req.body)
     .then(data => { res.jsonp(data) })
     .catch(err => { res.render('error', { error: err, message: `Erro na atualização do utilizador` }) })
 });
 
-router.put('/:id/desativar', Auth.validateAdministrador, function(req, res) {
+router.put('/:id/desativar', Auth.validateAdmin, function(req, res) {
   User.updateUser(req.params.id, false)
     .then(data => { res.jsonp(data) })
     .catch(err => { res.render('error', { error: err, message: `Erro na atualização do utilizador` }) })
 });
 
-router.put('/:id/ativar', Auth.validateAdministrador, function(req, res) {
+router.put('/:id/ativar', Auth.validateAdmin, function(req, res) {
   User.updateUser(req.params.id, true)
     .then(data => { res.jsonp(data) })
     .catch(err => { res.render('error', { error: err, message: `Erro na atualização do utilizador` }) })
 });
 
-router.put('/:id/password', Auth.validateAdministrador, function(req, res) {
+router.put('/:id/password', Auth.validateAdmin, function(req, res) {
   User.updateUserPassword(req.params.id, req.body)
     .then(data => { res.jsonp(data) })
     .catch(err => { res.render('error', { error: err, message: `Erro na atualização do utilizador` }) })
 });
 
-router.delete('/:id', Auth.validateAdministrador, function(req, res) {
+router.delete('/:id', Auth.validateAdmin, function(req, res) {
   User.deleteUser(req.params.id)
     .then(data => { res.jsonp(data) })
     .catch(err => { res.render('error', { error: err, message: `Erro na remoção do utilizador` }) })

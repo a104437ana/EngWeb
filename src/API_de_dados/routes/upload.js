@@ -101,6 +101,31 @@ async function saveZipFiles(zip, manifest, zipFolderPath, outputFolderPath) {
   }
 }
 
+router.get('/:id/diary', Auth.validateGetUserDiary, async function(req, res, next) {
+  if(req.level=="USER"){
+    if(req.user==req.params.id){
+      const diary = await Upload.allUserUploads(req.params.id);
+      logStream.write(`${new Date.toISOString()}:\n Diário do utilizador ${req.params.id} acedido pelo mesmo.\n`);
+      return res.status(200).jsonp(diary);
+    }
+    else{
+      const diary = await Upload.publicUserUploads(req.params.id);
+      logStream.write(`${new Date.toISOString()}:\n Diário do utilizador ${req.params.id} acedido pelo utilizador ${req.user}.\n`);
+      return res.status(200).jsonp(diary);
+    }
+  }
+  else if (req.level=="ADMIN"){
+      const diary = await Upload.allUserUploads(req.params.id);
+      logStream.write(`${new Date.toISOString()}:\n Diário do utilizador ${req.params.id} acedido pelo administrador ${req.user}.\n`);
+      return res.status(200).jsonp(diary);
+  }
+  else{
+    const diary = await Upload.publicUserUploads(req.params.id);
+    logStream.write(`${new Date.toISOString()}:\n Diário do utilizador ${req.params.id} acedido por utilizador público.\n`);
+    return res.status(200).jsonp(diary);
+  }
+});
+
 router.post('/', upload.single('file'), Auth.validate, async function(req, res, next) {
   try {
     const { zip, manifestData } = await readManifest(req.file.path);
