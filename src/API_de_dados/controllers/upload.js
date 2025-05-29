@@ -18,11 +18,11 @@ module.exports.hasUploads = async (id) =>{
 }
 
 module.exports.publicUserUploads = (id) =>{
-    return Upload.find({uploaded_by : id, public : true}).exec();
+    return Upload.find({uploaded_by : id, public : true}, '_id upload_date public description').exec();
 }
 
 module.exports.allUserUploads = (id) =>{
-    return Upload.find({uploaded_by : id}).exec();
+    return Upload.find({uploaded_by : id}, '_id upload_date public description').exec();
 }
 
 module.exports.save = async (upload) => {

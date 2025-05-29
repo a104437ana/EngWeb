@@ -9,54 +9,17 @@ block content
             a.w3-bar-item.w3-right.w3-hover-text-blue(href="/registar",, style="text-decoration: none;")
                 img(src="/images/add.png", style="height:50px;" )
                 span  Adicionar Item
-        p
-        .w3-content.w3-card-4.w3-white.w3-round
-            header.w3-container.w3-light-grey.w3-bar
-                h4.w3-bar-item.w3-left 
-                    img(src="/images/public.png", style="height:30px;" )
-                    span  10/09/2022
-            main.w3-container.w3-margin-bottom
-                h1 Imagem
-                img(src="/images/attach_file.png", style="height:50px;" )
-            br
-        br
-        .w3-content.w3-card-4.w3-white.w3-round
-            header.w3-container.w3-light-grey.w3-bar
-                h4.w3-bar-item.w3-left 
-                    img(src="/images/private.png", style="height:30px;" )
-                    span  10/09/2022
-            main.w3-container.w3-margin-bottom
-                h1 Imagem
-                img(src="/images/attach_file.png", style="height:50px;" )
-            br
-        br
-        .w3-content.w3-card-4.w3-white.w3-round
-            header.w3-container.w3-light-grey.w3-bar
-                h4.w3-bar-item.w3-left 
-                    img(src="/images/public.png", style="height:30px;" )
-                    span  10/09/2022
-            main.w3-container.w3-margin-bottom
-                h1 Imagem
-                img(src="/images/attach_file.png", style="height:50px;" )
-            br
-        br
-        .w3-content.w3-card-4.w3-white.w3-round
-            header.w3-container.w3-light-grey.w3-bar
-                h4.w3-bar-item.w3-left 
-                    span  10/09/2022 
-                    img(src="/images/private.png", style="height:30px;" )
-            main.w3-container.w3-margin-bottom
-                h1 Imagem
-                img(src="/images/attach_file.png", style="height:50px;" )
-            br
-        br
-        .w3-content.w3-card-4.w3-white.w3-round
-            header.w3-container.w3-light-grey.w3-bar
-                h4.w3-bar-item.w3-left 
-                    span  10/09/2022 
-                    img(src="/images/public.png", style="height:30px;" )
-            main.w3-container.w3-margin-bottom
-                h1 Imagem
-                img(src="/images/attach_file.png", style="height:50px;" )
-            br
-        br
+        ul.w3-ul
+            each entry in diary
+                li.w3-content.w3-card-4.w3-white.w3-round(style="position: relative;")
+                    a(href=`/myDiary/${entry._id}`, style="text-decoration: none; color: inherit; display: block; cursor: pointer")
+                        header.w3-container.w3-light-grey.w3-bar
+                            h4.w3-bar-item.w3-left 
+                                if entry.public
+                                    img(src="/images/public.png", style="height:30px;" )
+                                else 
+                                    img(src="/images/private.png", style="height:30px;" )
+                                span=entry.upload_date
+                        main.w3-container.w3-margin-bottom
+                            h1=entry.description
+                        br

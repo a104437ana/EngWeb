@@ -1,0 +1,50 @@
+extends layout
+
+block content
+    .w3-container.w3-padding-16
+        img(src="/images/diary.png", style="height:50px;" )
+        span  O Meu Diário
+            if upload.public
+                img(src="/images/public.png", style="height:30px;" )
+            else 
+                img(src="/images/private.png", style="height:30px;" )
+            span=upload.upload_date
+            h1=upload.description
+    ul.w3-ul
+        each file in upload.files
+            li.w3-content.w3-card-4.w3-white.w3-round(style="position: relative;")
+                    header.w3-container.w3-light-grey.w3-bar
+                        h2.w3-bar-item.w3-left=file.title
+                    main.w3-container.w3-margin-bottom
+                        h3=file.classification
+                        if file.type === 'image'
+                            img(id=`img-${file._id}`, alt=file.title, class='imagem', data-url=file.url, style="width:900px;height:auto;")
+                        else if file.type === 'pdf'
+                            iframe(src=file.url, width='100%', height='600px')
+                        a(href=file.url, download=file.title) Download
+                    br
+    script.
+        const TOKEN = !{JSON.stringify(token)};
+        document.addEventListener('DOMContentLoaded', () => {
+        const imagens = document.querySelectorAll('.imagem');
+        imagens.forEach(img => {
+            const url = img.dataset.url;
+            fetch(url, {
+            headers: {
+                Authorization: `Bearer ${TOKEN}`
+            }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Erro ao carregar imagem');
+                return res.blob();
+            })
+            .then(blob => {
+                const blobUrl = URL.createObjectURL(blob);
+                img.src = blobUrl;
+            })
+            .catch(err => {
+                console.error('Erro ao carregar imagem:', err);
+                img.alt = '[Erro ao carregar imagem]';
+            });
+        });
+        });

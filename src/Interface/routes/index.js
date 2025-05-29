@@ -34,15 +34,59 @@ router.get('/', function(req, res, next) {
 //  res.render('news',{title: "Notícias", date: date,role:"admin"});
 //});
 
-//router.get('/diary', function(req, res, next) {
-//  var date = new Date().toLocaleString('pt-PT', { hour12: false });
-//  res.render('diary',{title: "O Meu Diário", date: date,role:"cons"});
-//});
+router.get('/myDiary', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  axios.get(`http://localhost:3001/upload/diary/${req.session.user}`, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.render('diary',{title: "O Meu Diário", date: date, diary: resp.data, role: req.session.level, username: req.session.user});
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao ler o diário", error: error});
+  });
+});
 
-//router.get('/registar', function(req, res, next) {
-//  var date = new Date().toLocaleString('pt-PT', { hour12: false });
-//  res.render('registar',{title: "Adicionar Item", date: date,role:"cons"});
-//});
+router.get('/myDiary/:id', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  axios.get(`http://localhost:3001/upload/${req.params.id}`, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.render('upload',{title: "O Meu Diário", date: date, upload: resp.data, role: req.session.level, username: req.session.user, token: req.session.token});
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao ler o upload", error: error});
+  });
+});
+
+router.get('/registar', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  res.render('registar',{title: "Adicionar Item", date: date, role: req.session.level, username: req.session.user});
+});
+
+router.post('/registar', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  req.body.user = req.session.user;
+  req.body.token = req.session.token;
+  axios.post('http://localhost:3001/upload/', req.body, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.redirect('/myDiary');
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao fazer upload", error: error});
+  });
+});
+
+
+router.get('/logout', function(req, res, next) {
+  delete req.session.user;
+  delete req.session.level;
+  delete req.session.token;
+  res.redirect('/');
+});
 
 router.get('/login', function(req, res, next) {
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
@@ -61,6 +105,7 @@ router.post('/login', function(req, res, next) {
   axios.post(`http://localhost:3002/users/login`, req.body).then(resp => {
     req.session.user = req.body.username;
     req.session.level = req.body.level;
+    req.session.token = resp.data.token;
     res.redirect('/');
   }).catch(function (error) {
     req.session.loginError = "Erro no login: " + (error.response?.data?.message || "Tente novamente.");
@@ -79,6 +124,7 @@ router.post('/signup', function(req, res, next) {
   axios.post(`http://localhost:3002/users/`, req.body).then(resp => {
     req.session.user = req.body.username;
     req.session.level = 0;
+    req.session.token = resp.data.token;
     res.redirect('/')
   }).catch(function (error) {
     req.session.signupError = "Erro ao criar utilizador: " + (error.response?.data?.message || "Tente novamente.");

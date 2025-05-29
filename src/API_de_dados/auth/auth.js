@@ -1,13 +1,15 @@
 var jwt = require('jsonwebtoken')
 var Upload = require('../controllers/upload')
+var File = require('../controllers/file')
 
 module.exports.validate = (req, res, next) => {
-    var token = req.query.token || req.body.token || req.get('Authorization')
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
     if(token){
         jwt.verify(token, "EngWeb2025", (err, payload) => {
             if(err) res.status(401).jsonp(err)
             else{
-                req.user = payload.user
+                req.user = payload.username
                 next()
             }
         })
@@ -18,19 +20,20 @@ module.exports.validate = (req, res, next) => {
 }
 
 module.exports.validateChangeUpload = (req, res, next) => {
-    var token = req.query.token || req.body.token || req.get('Authorization')
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
     if(token){
         jwt.verify(token, "EngWeb2025", (err, payload) => {
             if(err) res.status(401).jsonp(err)
             else{
                 const upload = Upload.findById(req.params.id);
                 if(upload){
-                    if(payload.level == "ADMIN"){
-                        req.user = payload.user
+                    if(payload.level == 1){
+                        req.user = payload.username
                         next()
                     }
-                    else if(upload.uploaded_by == payload.user){
-                        req.user = payload.user
+                    else if(upload.uploaded_by == payload.username){
+                        req.user = payload.username
                         next()
                     }
                     else{
@@ -49,26 +52,21 @@ module.exports.validateChangeUpload = (req, res, next) => {
 }
 
 module.exports.validateGetUserDiary = (req, res, next) => {
-    var token = req.query.token || req.body.token || req.get('Authorization')
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
     if(token){
-        jwt.verify(token, "EngWeb2025", (err, payload) => {
+        jwt.verify(token, "EngWeb2025", async (err, payload) => {
             if(err) res.status(401).jsonp(err)
             else{
-                const diary = Upload.hasUploads(req.params.id);
-                if(diary==true){
-                    if(payload.level == "ADMIN"){
-                        req.level = "ADMIN"
-                        req.user = payload.user
-                        next()
-                    }
-                    else{
-                        req.level = "USER"
-                        req.user = payload.user
-                        next()
-                    }
+                if(payload.level == 1){
+                    req.level = "ADMIN"
+                    req.user = payload.username
+                    next()
                 }
                 else{
-                    res.status(404).jsonp({error : "Diário não existe"})
+                    req.level = "USER"
+                    req.user = payload.username
+                    next()
                 }
             }
         })
@@ -76,5 +74,105 @@ module.exports.validateGetUserDiary = (req, res, next) => {
     else{
         req.level = "PUBLIC"
         next()
+    }
+}
+
+module.exports.validateGetUpload = async (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if(token){
+        jwt.verify(token, "EngWeb2025", async (err, payload) => {
+            if(err) res.status(401).jsonp(err)
+            else{
+                const upload = await Upload.findById(req.params.id);
+                if(upload.public==true){
+                    if(payload.level == 1){
+                        req.level = "ADMIN"
+                        req.user = payload.username
+                        next()
+                    }
+                    else{
+                        req.level = "USER"
+                        req.user = payload.username
+                        next()
+                    }
+                }
+                else{
+                    if(payload.level == 1){
+                        req.level = "ADMIN"
+                        req.user = payload.username
+                        next()
+                    }
+                    else if (upload.uploaded_by == payload.username){
+                        req.level = "USER"
+                        req.user = payload.username
+                        next()
+                    }
+                    else{
+                        res.status(401).jsonp({error : "Utilizador não tem permissão para aceder ao upload"})
+                    }
+                }
+            }
+        })
+    }
+    else{
+        const upload = await Upload.findById(req.params.id);
+        if(upload.public==true){
+            req.level = "PUBLIC"
+            next()
+        }
+        else{
+            res.status(401).jsonp({error : "Utilizador não tem permissão para aceder ao upload"})
+        }
+    }
+}
+
+module.exports.validateGetFile = async (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if(token){
+        jwt.verify(token, "EngWeb2025", async (err, payload) => {
+            if(err) res.status(401).jsonp(err)
+            else{
+                const file = await File.findById(req.params.id);
+                if(file.public==true){
+                    if(payload.level == 1){
+                        req.level = "ADMIN"
+                        req.user = payload.username
+                        next()
+                    }
+                    else{
+                        req.level = "USER"
+                        req.user = payload.username
+                        next()
+                    }
+                }
+                else{
+                    if(payload.level == 1){
+                        req.level = "ADMIN"
+                        req.user = payload.username
+                        next()
+                    }
+                    else if (file.uploaded_by == payload.username){
+                        req.level = "USER"
+                        req.user = payload.username
+                        next()
+                    }
+                    else{
+                        res.status(401).jsonp({error : "Utilizador não tem permissão para aceder ao ficheiro"})
+                    }
+                }
+            }
+        })
+    }
+    else{
+        const file = await File.findById(req.params.id);
+        if(file.public==true){
+            req.level = "PUBLIC"
+            next()
+        }
+        else{
+            res.status(401).jsonp({error : "Utilizador não tem permissão para aceder ao ficheiro"})
+        }
     }
 }
