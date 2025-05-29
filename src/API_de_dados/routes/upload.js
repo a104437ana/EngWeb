@@ -129,14 +129,6 @@ router.get('/diary/:id', Auth.validateGetUserDiary, async function(req, res, nex
   }
 });
 
-router.get('/files/:id', Auth.validateGetFile, async function(req, res, next) {
-  date = new Date().toISOString();
-  const file = await File.findById(req.params.id);
-  if (!file) return res.status(404).send('Ficheiro não encontrado');
-  const filePath = path.resolve(file.path);
-  res.sendFile(filePath);
-});
-
 router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
   date = new Date().toISOString();
   if(req.level=="USER"){

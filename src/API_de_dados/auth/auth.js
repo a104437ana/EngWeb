@@ -20,34 +20,33 @@ module.exports.validate = (req, res, next) => {
 }
 
 module.exports.validateChangeUpload = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
+const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
     if(token){
-        jwt.verify(token, "EngWeb2025", (err, payload) => {
-            if(err) res.status(401).jsonp(err)
+        jwt.verify(token, "EngWeb2025", async (err, payload) => {
+            if(err){
+                res.status(401).jsonp({error : "Utilizador não tem permissão para aceder ao upload"})
+            }
             else{
-                const upload = Upload.findById(req.params.id);
-                if(upload){
+                const upload = await Upload.findById(req.params.id);
                     if(payload.level == 1){
+                        req.level = "ADMIN"
                         req.user = payload.username
                         next()
                     }
-                    else if(upload.uploaded_by == payload.username){
+                    else if (upload.uploaded_by == payload.username){
+                        req.level = "USER"
                         req.user = payload.username
                         next()
                     }
                     else{
-                        res.status(401).jsonp({error : "Utilizador não tem permissão para alterar o upload"})
+                        res.status(401).jsonp({error : "Utilizador não tem permissão para aceder ao upload"})
                     }
-                }
-                else{
-                    res.status(404).jsonp({error : "Upload não existe"})
-                }
             }
         })
     }
     else{
-        res.status(401).jsonp({error : "Token inexistente"})
+            res.status(401).jsonp({error : "Utilizador não tem permissão para aceder ao upload"})
     }
 }
 

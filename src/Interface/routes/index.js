@@ -6,6 +6,7 @@ const upload = require('../../API_de_dados/models/upload');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+  delete req.session.currentDiary;
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
   res.render('home',{title: "O Meu Eu Digital", date: date, role: req.session.level, username: req.session.user});
 });
@@ -46,7 +47,7 @@ router.get('/file/:id', async (req, res) => {
     if (token) {
       axiosConfig.headers.Authorization = `Bearer ${token}`;
     }
-    const axiosResponse = await axios.get(`http://localhost:3001/upload/files/${fileId}`, axiosConfig);
+    const axiosResponse = await axios.get(`http://localhost:3001/file/${fileId}`, axiosConfig);
     res.setHeader('Content-Type', axiosResponse.headers['content-type']);
     axiosResponse.data.pipe(res);
   } catch (err) {
@@ -58,6 +59,7 @@ router.get('/file/:id', async (req, res) => {
 router.get('/users', (req, res) => {
   const user = req.query.user;
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  req.session.currentDiary = user;
   axios.get(`http://localhost:3001/upload/diary/${user}`, {
     headers: {
       Authorization: `Bearer ${req.session.token}`
@@ -70,6 +72,7 @@ router.get('/users', (req, res) => {
 });
 
 router.get('/myDiary', function(req, res, next) {
+  req.session.currentDiary = req.session.user;
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
   axios.get(`http://localhost:3001/upload/diary/${req.session.user}`, {
     headers: {
@@ -79,6 +82,24 @@ router.get('/myDiary', function(req, res, next) {
     res.render('myDiary',{title: "O Meu Diário", date: date, diary: resp.data, role: req.session.level, username: req.session.user});
   }).catch(function (error) {
     res.render('error',{title: "Erro", date: date, message : "Erro ao ler o diário", error: error});
+  });
+});
+
+router.get('/uploads/delete/:id', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  axios.delete(`http://localhost:3001/upload/${req.params.id}`, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    if(req.session.level == 1){
+      res.redirect(`/users?user=${req.session.currentDiary}`)
+    }
+    else{
+      res.redirect(`/myDiary`)
+    }
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao apagar o upload", error: error});
   });
 });
 
@@ -165,6 +186,7 @@ router.get('/logout', function(req, res, next) {
   delete req.session.user;
   delete req.session.level;
   delete req.session.token;
+  delete req.session.currentDiary;
   res.redirect('/');
 });
 

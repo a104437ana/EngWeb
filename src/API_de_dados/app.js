@@ -13,6 +13,7 @@ connection.on('error', console.error.bind(console, 'Erro na conexão ao MongoDB'
 connection.once('open', () => console.log('Conexão ao MongoDB realizada com sucesso'))
 
 var uploadRouter = require('./routes/upload');
+var fileRouter = require('./routes/file');
 
 var app = express();
 
@@ -32,6 +33,7 @@ app.use(cors({
 }));
 
 app.use('/upload', uploadRouter);
+app.use('/file', fileRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
