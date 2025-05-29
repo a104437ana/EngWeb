@@ -18,33 +18,8 @@ block content
                     main.w3-container.w3-margin-bottom
                         h3=file.classification
                         if file.type === 'image'
-                            img(id=`img-${file._id}`, alt=file.title, class='imagem', data-url=file.url, style="width:900px;height:auto;")
+                            img(src=`/file/${file.id}`, alt=file.title, style="width:900px;height:auto;")
                         else if file.type === 'pdf'
-                            iframe(src=file.url, width='100%', height='600px')
-                        a(href=file.url, download=file.title) Download
+                            iframe(src=`/file/${file.id}`, width='900px', height='auto')
+                        a(href=`/file/${file.id}`, download=file.title) Download
                     br
-    script.
-        const TOKEN = !{JSON.stringify(token)};
-        document.addEventListener('DOMContentLoaded', () => {
-        const imagens = document.querySelectorAll('.imagem');
-        imagens.forEach(img => {
-            const url = img.dataset.url;
-            fetch(url, {
-            headers: {
-                Authorization: `Bearer ${TOKEN}`
-            }
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Erro ao carregar imagem');
-                return res.blob();
-            })
-            .then(blob => {
-                const blobUrl = URL.createObjectURL(blob);
-                img.src = blobUrl;
-            })
-            .catch(err => {
-                console.error('Erro ao carregar imagem:', err);
-                img.alt = '[Erro ao carregar imagem]';
-            });
-        });
-        });

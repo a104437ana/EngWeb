@@ -47,7 +47,7 @@ async function checkManifestFolder(zip, manifest, path){
   }
 }
 
-async function saveMetadata(zip, manifest, path, user){
+async function saveMetadata(zip, manifest, path, user, public){
   let files = manifest.files?.file || [];
   if (!Array.isArray(files)) files = [files];
   const file_ids_res = []
@@ -59,7 +59,7 @@ async function saveMetadata(zip, manifest, path, user){
       type: element.type,
       classification: element.classification,
       uploaded_by : user,
-      public : manifest.public
+      public : public
     };
     const f = await File.save(file);
     file_ids_res.push(f._id);
@@ -69,7 +69,7 @@ async function saveMetadata(zip, manifest, path, user){
     if (!Array.isArray(subfolders)) subfolders = [subfolders];
     for (const subfolder of subfolders) {
       const subfolderPath = path + subfolder.folder_name + '/';
-      const files = await saveMetadata(zip, subfolder, subfolderPath, user);
+      const files = await saveMetadata(zip, subfolder, subfolderPath, user, public);
       file_ids_res.push(...files);
     }
   }
@@ -150,10 +150,12 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
       for (const f_id of upload.files) {
         const file = await File.findById(f_id);
         upload_info.files.push({
+          id: f_id,
           title: file.title,
           type: file.type,
           classification: file.classification,
-          url: `http://localhost:3001/upload/files/${file._id}`
+          uploaded_by : file.uploaded_by,
+          public : file.public
         });
       }
       logStream.write(`${date}:\n Upload ${req.params.id} acedido pelo utilizador ${req.user}.\n`);
@@ -171,14 +173,16 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
       for (const f_id of upload.files) {
         const file = await File.findById(f_id);
         upload_info.files.push({
+          id: f_id,
           title: file.title,
           type: file.type,
           classification: file.classification,
-          url: `http://localhost:3001/files/${file._id}`
+          uploaded_by : file.uploaded_by,
+          public : file.public
         });
       }
       logStream.write(`${date}:\n Upload ${req.params.id} acedido pelo administrador ${req.user}.\n`);
-      return res.status(200).jsonp(upload);
+      return res.status(200).jsonp(upload_info);
   }
   else{
       const upload = await Upload.findById(req.params.id);
@@ -191,14 +195,16 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
       for (const f_id of upload.files) {
         const file = await File.findById(f_id);
         upload_info.files.push({
+          id: f_id,
           title: file.title,
           type: file.type,
           classification: file.classification,
-          url: `http://localhost:3001/files/${file._id}`
+          uploaded_by : file.uploaded_by,
+          public : file.public
         });
       }
       logStream.write(`${date}:\n Upload ${req.params.id} acedido por utilizador público.\n`);
-      return res.status(200).jsonp(upload);
+      return res.status(200).jsonp(upload_info);
   }
 });
 
@@ -208,7 +214,7 @@ router.post('/', upload.single('file'), Auth.validate, async function(req, res, 
   try {
     const { zip, manifestData } = await readManifest(req.body.file);
     await checkManifestFolder(zip, manifestData, "SIP");
-    const file_ids = await saveMetadata(zip, manifestData, __dirname + '/../public/fileStore/' + manifestData.folder_name + '/', req.body.user);
+    const file_ids = await saveMetadata(zip, manifestData, __dirname + '/../public/fileStore/' + manifestData.folder_name + '/', req.body.user, manifestData.public);
     var upload = {
       path : __dirname + '/../public/fileStore/' + manifestData.folder_name + '/',
       upload_date : new Date().toISOString(),
