@@ -1,0 +1,34 @@
+extends layout
+
+block content
+    .w3-container.w3-padding-16
+        img(src="/images/diary.png", style="height:50px;" )
+        span  O Meu Diário
+            if upload.public
+                img(src="/images/public.png", style="height:30px;" )
+            else 
+                img(src="/images/private.png", style="height:30px;" )
+            span=upload.upload_date
+            h1 Editar upload: #{upload.description}
+    form.w3-container.w3-card.w3-white.w3-round(method="POST")
+        ul.w3-ul(style="display: flex; flex-direction: column; align-items: center; gap: 10px;")
+            each file in upload.files
+                li.w3-content.w3-card-4.w3-white.w3-round.w3-block(style="position: relative;")
+                    header.w3-container.w3-light-grey.w3-bar(style="display: flex; align-items: center; gap: 10px;")
+                        label
+                            h2.w3-bar-item.w3-left Título
+                        input.w3-input.w3-border.w3-round(type="text" name="filetitle" value=file.title)
+                    main.w3-container.w3-margin-bottom(style="display: flex; align-items: center; gap: 10px;")
+                        label
+                            h3.w3-bar-item.w3-left Classificação
+                        input.w3-input.w3-border.w3-round(type="text" name="fileclassification" value=file.classification)
+                        if file.type === 'image'
+                            label Ficheiro
+                            input.w3-input.w3-border.w3-round(type="file" name="file" value=file)
+                            img(src=`/file/${file.id}`, alt=file.title, style="width:900px;height:auto;")
+                        else if file.type === 'pdf'
+                            label Ficheiro
+                            input.w3-input.w3-border.w3-round(type="file" name="file" value=file)
+                            iframe(src=`/file/${file.id}`, width='900px', height='auto')
+                    br
+        button.w3-button.w3-medium.w3-cyan.w3-text-black.w3-hover-cyan.w3-hover-text-black.w3-block(type="submit") Editar

@@ -95,12 +95,57 @@ router.get('/uploads/:id', function(req, res, next) {
   });
 });
 
+// este também está inacabado podes eliminar
+router.get('/uploads/delete/:id', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  axios.delete(`http://localhost:3001/upload/${req.params.id}`, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.redirect(req.get('referer') || '/myDiary');
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao ler o upload", error: error});
+  });
+});
+
 router.get('/registar', function(req, res, next) {
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
   res.render('registar',{title: "Adicionar Item", date: date, role: req.session.level, username: req.session.user});
 });
 
 router.post('/registar', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  req.body.user = req.session.user;
+  req.body.token = req.session.token;
+  axios.post('http://localhost:3001/upload/', req.body, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.redirect('/myDiary');
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao fazer upload", error: error});
+  });
+});
+
+// fiz este para mostrar o formulário de editar
+router.get('/editar/:id', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  axios.get(`http://localhost:3001/upload/${req.params.id}`, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    console.log('Upload recebido:', resp.data);
+    res.render('editar',{title: "Editar Item", upload: resp.data, date: date, role: req.session.level, username: req.session.user});
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao ler o upload", error: error});
+  });
+});
+
+// este está inacabado podes eliminar
+router.post('/editar/:id', function(req, res, next) {
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
   req.body.user = req.session.user;
   req.body.token = req.session.token;
