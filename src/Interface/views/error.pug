@@ -5,6 +5,8 @@ block content
     i.w3-jumbo.fa.fa-exclamation-triangle
     h1 Erro #{error.status || 500}
     h2 #{message || "Ocorreu um erro inesperado."}
+      if error.response.data.error
+        span : #{error.response.data.error}
 
     if error && error.stack
       details.w3-center.w3-margin-top

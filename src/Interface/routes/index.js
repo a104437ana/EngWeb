@@ -22,10 +22,18 @@ router.get('/', function(req, res, next) {
 //  res.render('home',{title: "I am ... (in bits and bytes)", date: date,role:"cons"});
 //});
 
-//router.get('/users', function(req, res, next) {
-//  var date = new Date().toLocaleString('pt-PT', { hour12: false });
-//  res.render('users',{title: "Utilizadores", date: date,role:"admin"});
-//});
+router.get('/users', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  axios.get(`http://localhost:3002/users`, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.render('users',{title: "Utilizadores", users: resp.data.data, date: date, role:"admin"});
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Não foi possível aceder à página", error: error});
+  });
+});
 
 //router.get('/recursos', function(req, res, next) {
 //  var date = new Date().toLocaleString('pt-PT', { hour12: false });
