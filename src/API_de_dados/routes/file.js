@@ -19,7 +19,7 @@ async function replaceFile(filePath, fileBuffer, name) {
     await fs.promises.unlink(filePath);
   }
   const ext = path.extname(name).toLowerCase();
-  if (['.png', '.jpeg', '.jpg'].includes(ext)) {
+  if (['.apng', '.gif', '.ico', '.cur', '.png', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.svg'].includes(ext)) {
     type = 'image';
   } else if (ext === '.pdf') {
     type = 'pdf';
