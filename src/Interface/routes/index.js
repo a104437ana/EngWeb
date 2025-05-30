@@ -4,6 +4,10 @@ var axios = require('axios');
 const session = require('express-session');
 const upload = require('../../API_de_dados/models/upload');
 
+function now() {
+  return new Date().toLocaleString('pt-PT', { hour12: false });
+}
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   delete req.session.currentDiary;
@@ -58,6 +62,9 @@ router.get('/file/:id', async (req, res) => {
 
 router.get('/users', (req, res) => {
   const user = req.query.user;
+  if (!user) {
+    return res.redirect('/');
+  }
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
   req.session.currentDiary = user;
   axios.get(`http://localhost:3001/upload/diary/${user}`, {
