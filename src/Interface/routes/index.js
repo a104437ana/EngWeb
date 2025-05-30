@@ -2,7 +2,9 @@ var express = require('express');
 var router = express.Router();
 var axios = require('axios');
 const session = require('express-session');
-const upload = require('../../API_de_dados/models/upload');
+const multer = require('multer');
+const upload = multer();
+const FormData = require('form-data');
 
 function now() {
   return new Date().toLocaleString('pt-PT', { hour12: false });
@@ -110,6 +112,113 @@ router.get('/uploads/delete/:id', function(req, res, next) {
   });
 });
 
+
+router.get('/uploads/edit/:id', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  axios.get(`http://localhost:3001/upload/${req.params.id}`, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.render('editar',{title: "Editar Item", upload: resp.data, date: date, role: req.session.level, username: req.session.user});
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao ler o upload", error: error});
+  });
+});
+
+function parseFilesFromBody(body, files) {
+  const result = [];
+  const fileMap = {};
+  if (files) {
+    for (const f of files) {
+      const match = f.fieldname.match(/^files\[(\d+)]\[file]$/);
+      if (match) {
+        const index = parseInt(match[1]);
+        fileMap[index] = f;
+      }
+    }
+  }
+  Object.keys(body).forEach(key => {
+    const match = key.match(/^files\[(\d+)]\[(\w+)]$/);
+    if (match) {
+      const index = parseInt(match[1]);
+      const prop = match[2];
+      if (!result[index]) result[index] = {};
+      result[index][prop] = body[key];
+    }
+  });
+  for (const index in fileMap) {
+    if (!result[index]) result[index] = {};
+    result[index].file = fileMap[index];
+  }
+  return result;
+}
+
+
+router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
+  const date = new Date().toLocaleString('pt-PT', { hour12: false });
+  try {
+    let filesData = [];
+
+    if (req.body.files && Array.isArray(req.body.files)) {
+      filesData = req.body.files;
+    } else {
+      filesData = parseFilesFromBody(req.body, req.files);
+    }
+    await axios.put(`http://localhost:3001/upload/${req.params.id}`, {
+      description: req.body.description,
+      public: req.body.public === 'true' || req.body.public === true,
+      user: req.session.user,
+      token: req.session.token,
+      files: filesData.map(f => ({
+        id: f.id,
+        title: f.title,
+        classification: f.classification
+      }))
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${req.session.token}`
+      }
+    });
+    for (const file of req.files) {
+      // file.fieldname é algo tipo "files[0][file]"
+      const match = file.fieldname.match(/files\[(\d+)\]\[file\]/);
+      if (match) {
+        const index = parseInt(match[1], 10);
+        if (filesData[index]) {
+          filesData[index].file = file;
+        }
+      }
+    }
+    console.log(filesData);
+    for (const file of filesData) {
+      if (file.file) {
+        const formData = new FormData();
+        formData.append('file', file.file.buffer, file.file.originalname);
+        await axios.put(`http://localhost:3001/file/${file.id}`, formData, {
+          headers: {
+            ...formData.getHeaders(),
+            Authorization: `Bearer ${req.session.token}`
+          }
+        });
+      }
+    }
+    if (req.session.level == 1) {
+      res.redirect(`/users?user=${req.session.currentDiary}`);
+    } else {
+      res.redirect(`/myDiary`);
+    }
+  } catch (error) {
+    res.render('error', {
+      title: "Erro",
+      date,
+      message: "Erro ao editar o upload",
+      error
+    });
+  }
+});
+
 router.get('/uploads/:id', function(req, res, next) {
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
   axios.get(`http://localhost:3001/upload/${req.params.id}`, {
@@ -118,20 +227,6 @@ router.get('/uploads/:id', function(req, res, next) {
     }
   }).then(resp => {
     res.render('upload',{title: resp.data.description, date: date, upload: resp.data, role: req.session.level, username: req.session.user, token: req.session.token});
-  }).catch(function (error) {
-    res.render('error',{title: "Erro", date: date, message : "Erro ao ler o upload", error: error});
-  });
-});
-
-// este também está inacabado podes eliminar
-router.get('/uploads/delete/:id', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
-  axios.delete(`http://localhost:3001/upload/${req.params.id}`, {
-    headers: {
-      Authorization: `Bearer ${req.session.token}`
-    }
-  }).then(resp => {
-    res.redirect(req.get('referer') || '/myDiary');
   }).catch(function (error) {
     res.render('error',{title: "Erro", date: date, message : "Erro ao ler o upload", error: error});
   });
@@ -156,38 +251,6 @@ router.post('/registar', function(req, res, next) {
     res.render('error',{title: "Erro", date: date, message : "Erro ao fazer upload", error: error});
   });
 });
-
-// fiz este para mostrar o formulário de editar
-router.get('/editar/:id', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
-  axios.get(`http://localhost:3001/upload/${req.params.id}`, {
-    headers: {
-      Authorization: `Bearer ${req.session.token}`
-    }
-  }).then(resp => {
-    console.log('Upload recebido:', resp.data);
-    res.render('editar',{title: "Editar Item", upload: resp.data, date: date, role: req.session.level, username: req.session.user});
-  }).catch(function (error) {
-    res.render('error',{title: "Erro", date: date, message : "Erro ao ler o upload", error: error});
-  });
-});
-
-// este está inacabado podes eliminar
-router.post('/editar/:id', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
-  req.body.user = req.session.user;
-  req.body.token = req.session.token;
-  axios.post('http://localhost:3001/upload/', req.body, {
-    headers: {
-      Authorization: `Bearer ${req.session.token}`
-    }
-  }).then(resp => {
-    res.redirect('/myDiary');
-  }).catch(function (error) {
-    res.render('error',{title: "Erro", date: date, message : "Erro ao fazer upload", error: error});
-  });
-});
-
 
 router.get('/logout', function(req, res, next) {
   delete req.session.user;

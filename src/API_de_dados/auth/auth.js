@@ -25,7 +25,7 @@ const authHeader = req.headers['authorization'];
     if(token){
         jwt.verify(token, "EngWeb2025", async (err, payload) => {
             if(err){
-                res.status(401).jsonp({error : "Utilizador não tem permissão para aceder ao upload"})
+                res.status(401).jsonp({error : "Utilizador não tem permissão para alterar o upload"})
             }
             else{
                 const upload = await Upload.findById(req.params.id);
@@ -40,13 +40,44 @@ const authHeader = req.headers['authorization'];
                         next()
                     }
                     else{
-                        res.status(401).jsonp({error : "Utilizador não tem permissão para aceder ao upload"})
+                        res.status(401).jsonp({error : "Utilizador não tem permissão para alterar o upload"})
                     }
             }
         })
     }
     else{
-            res.status(401).jsonp({error : "Utilizador não tem permissão para aceder ao upload"})
+            res.status(401).jsonp({error : "Utilizador não tem permissão para alterar o upload"})
+    }
+}
+
+module.exports.validateChangeFile = (req, res, next) => {
+const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if(token){
+        jwt.verify(token, "EngWeb2025", async (err, payload) => {
+            if(err){
+                res.status(401).jsonp({error : "Utilizador não tem permissão para alterar o ficheiro"})
+            }
+            else{
+                const file = await File.findById(req.params.id);
+                    if(payload.level == 1){
+                        req.level = "ADMIN"
+                        req.user = payload.username
+                        next()
+                    }
+                    else if (file.uploaded_by == payload.username){
+                        req.level = "USER"
+                        req.user = payload.username
+                        next()
+                    }
+                    else{
+                        res.status(401).jsonp({error : "Utilizador não tem permissão para alterar o ficheiro"})
+                    }
+            }
+        })
+    }
+    else{
+            res.status(401).jsonp({error : "Utilizador não tem permissão para alterar o ficheiro"})
     }
 }
 

@@ -36,3 +36,19 @@ module.exports.delete = async (id) => {
         .exec()
     return upload;
 }
+
+
+module.exports.update = async (id, data) => {
+    var old = Upload.findById(id).exec();
+    var upload = {
+        path : old.path,
+        upload_date : old.upload_date,
+        uploaded_by : old.uploaded_by,
+        public : data.public,
+        description : data.description,
+        files : old.files
+    }
+    return Upload
+        .findByIdAndUpdate(id, upload, {new : true})
+        .exec()
+}

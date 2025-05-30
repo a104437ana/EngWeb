@@ -227,11 +227,39 @@ router.post('/', upload.single('file'), Auth.validate, async function(req, res, 
   }
 });
 
+router.put('/:id', Auth.validateChangeUpload, async function(req, res, next) {
+  try {
+    console.log(req.body)
+    const date = new Date().toISOString();
+    const upload = await Upload.update(req.params.id, {
+      description: req.body.description,
+      public: req.body.public === 'true'
+    });
+    if (req.body.files) {
+      const files = Array.isArray(req.body.files) ? req.body.files : Object.values(req.body.files);
+      for (const file of files) {
+        if (file.id) {
+          await File.update(file.id, {
+            title: file.title,
+            classification: file.classification
+          });
+        }
+      }
+    }
+    logStream.write(`${date}:\n Upload ${upload._id} alterado pelo utilizador ${req.user}\n`);
+    return res.status(200).json(upload);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+
 router.delete('/:id', Auth.validateChangeUpload, async function(req, res, next) {
   try {
+    date = new Date().toISOString();
     const upload = await Upload.delete(req.params.id);
     await fs.promises.rm(upload.path, { recursive: true , force : true})
-    logStream.write(`${upload.upload_date.toISOString()}:\n Upload ${upload._id} apagado pelo utilizador ${req.user}\n`)
+    logStream.write(`${date}:\n Upload ${upload._id} apagado pelo utilizador ${req.user}\n`)
     return res.status(200).jsonp(upload)
   }
   catch (error) {
