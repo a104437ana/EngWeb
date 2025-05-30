@@ -22,7 +22,7 @@ router.get('/', function(req, res, next) {
 //  res.render('home',{title: "I am ... (in bits and bytes)", date: date,role:"cons"});
 //});
 
-router.get('/users', function(req, res, next) {
+router.get('/administration/users', function(req, res, next) {
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
   axios.get(`http://localhost:3002/users`, {
     headers: {
