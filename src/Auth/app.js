@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const {v4 : uuidv4} = require('uuid')
 var session = require('express-session')
+var UserController = require('./controllers/user')
 
 var mongoose = require('mongoose');
 var passport = require('passport');
@@ -14,7 +15,14 @@ var mongoDB = 'mongodb://localhost:27017/users';
 mongoose.connect(mongoDB);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Erro na conexão ao MongoDB'));
-db.on('open', () => console.log("Conexão ao MongoDB realizada com sucesso..."));
+db.on('open', async () => {
+  try {
+    await UserController.initAdmin();
+    console.log("Conexão ao MongoDB realizada com sucesso...");
+  } catch (err) {
+    console.error("Erro ao inicializar admin:", err);
+  }
+});
 
 // passport config
 var User = require('./models/user');

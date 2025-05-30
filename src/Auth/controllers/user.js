@@ -42,3 +42,17 @@ module.exports.deleteUser = (id) => {
         .findByIdAndDelete(id, {new: true})
         .exec()
 }
+
+module.exports.initAdmin = async () => {
+    const adminExists = await User.findOne({ level: 1 });
+    if (!adminExists) {
+        var date = new Date().toISOString().substring(0, 19)
+        await User.register(new User({
+            username: "admin",
+            name: "admin",
+            level: 1,
+            active: true,
+            dateCreated: date
+        }), "admin");
+    }
+}
