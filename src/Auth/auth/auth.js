@@ -2,6 +2,7 @@ var jwt = require('jsonwebtoken')
 
 module.exports.validate = (req, res, next) => {
     var token = req.query.token || req.body.token || req.get('Authorization')
+    if (token && token.startsWith('Bearer ')) token = token.slice(7);
     if (token) {
         jwt.verify(token, "EngWeb2025", (err, payload) => {
             if (err) res.status(401).jsonp(err)
@@ -13,6 +14,7 @@ module.exports.validate = (req, res, next) => {
 
 module.exports.validateUtilizador = (req, res, next) => {
     var token = req.query.token || req.body.token || req.get('Authorization')
+    if (token && token.startsWith('Bearer ')) token = token.slice(7);
     if (token) {
         jwt.verify(token, "EngWeb2025", (err, payload) => {
             if (err) res.status(401).jsonp(err)
@@ -26,6 +28,7 @@ module.exports.validateUtilizador = (req, res, next) => {
 
 module.exports.validateAdmin = (req, res, next) => {
     var token = req.query.token || req.body.token || req.get('Authorization')
+    if (token && token.startsWith('Bearer ')) token = token.slice(7);
     if (token) {
         jwt.verify(token, "EngWeb2025", (err, payload) => {
             if (err) res.status(401).jsonp(err)
