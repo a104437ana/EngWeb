@@ -6,22 +6,22 @@ block content
             .w3-bar-item.w3-left
                 img(src="/images/diary.png", style="height:50px;" )
                 span=`Diário de ${user}` 
-        ul.w3-ul
-            each entry in diary
-                li.w3-content.w3-card-4.w3-white.w3-round(style="position: relative;")
-                    header.w3-container.w3-light-grey.w3-bar
-                        h4.w3-bar-item.w3-left 
-                            if entry.public
-                                img(src="/images/public.png", style="height:30px;" )
-                            else 
-                                img(src="/images/private.png", style="height:30px;" )
-                            span=entry.upload_date
-                        if role==1
-                            form(method="GET", action=`/uploads/edit/${entry._id}`)
-                                button.w3-bar-item.w3-right.w3-button.w3-green(type="submit") ✏️
-                            form(method="GET", action=`/uploads/delete/${entry._id}`)
-                                button.w3-bar-item.w3-right.w3-button.w3-green(type="submit") 🗑️
-                    a(href=`/uploads/${entry._id}`, style="text-decoration: none; color: inherit; display: block; cursor: pointer")
-                        main.w3-container.w3-margin-bottom
-                            h1=entry.description
-                        br
+            ul.w3-ul
+                each entry in diary
+                    li.w3-content.w3-card-4.w3-white.w3-round(style="position: relative;")
+                        header.w3-container.w3-light-grey.w3-bar
+                            h4.w3-bar-item.w3-left 
+                                if entry.public
+                                    img(src="/images/public.png", style="height:30px;" )
+                                else 
+                                    img(src="/images/private.png", style="height:30px;" )
+                                span=entry.upload_date
+                            if role==1
+                                form(method="GET", action=`/uploads/edit/${entry._id}`)
+                                    button.w3-bar-item.w3-right.w3-button.w3-green(type="submit") ✏️
+                                form(method="GET", action=`/uploads/delete/${entry._id}`)
+                                    button.w3-bar-item.w3-right.w3-button.w3-green(type="submit") 🗑️
+                        a(href=`/uploads/${entry._id}`, style="text-decoration: none; color: inherit; display: block; cursor: pointer")
+                            main.w3-container.w3-margin-bottom
+                                h1=entry.description
+                            br

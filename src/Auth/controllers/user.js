@@ -14,6 +14,18 @@ module.exports.getUser = (id) => {
         .exec()
 }
 
+module.exports.existsUser = async (id) => {
+    const e = await User
+        .exists({username: id})
+        .exec();
+    if(e==null){
+        return false;
+    }
+    else{
+        return true;
+    }
+}
+
 module.exports.addUser = (user) => {
     var userDb = new User(user)
     return userDb.save()

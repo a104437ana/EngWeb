@@ -138,22 +138,28 @@ router.get('/file/:id', async (req, res) => {
   }
 });
 
-router.get('/users', (req, res) => {
+router.get('/users', async (req, res) => {
   const user = req.query.user;
   if (!user) {
     return res.redirect('/');
   }
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
-  req.session.currentDiary = user;
-  axios.get(`http://localhost:3001/upload/diary/${user}`, {
-    headers: {
-      Authorization: `Bearer ${req.session.token}`
-    }
-  }).then(resp => {
-    res.render('diary',{title: `Diário de ${user}`, date: date, diary: resp.data, role: req.session.level, username: req.session.user, user:user});
-  }).catch(function (error) {
-    res.render('error',{title: "Erro", date: date, message : "Erro ao ler o diário", error: error});
-  });
+  const exists = await axios.get(`http://localhost:3002/users/exists/${user}`);
+  if(exists.data.data==true){
+    req.session.currentDiary = user;
+    axios.get(`http://localhost:3001/upload/diary/${user}`, {
+      headers: {
+        Authorization: `Bearer ${req.session.token}`
+      }
+    }).then(resp => {
+      res.render('diary',{title: `Diário de ${user}`, date: date, diary: resp.data, role: req.session.level, username: req.session.user, user:user});
+    }).catch(function (error) {
+      res.render('error',{title: "Erro", date: date, message : "Erro ao ler o diário", error: error});
+    });
+  }
+  else{
+    return res.redirect('/');
+  }
 });
 
 router.get('/myDiary', function(req, res, next) {
