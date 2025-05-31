@@ -22,6 +22,73 @@ router.get('/', function(req, res, next) {
 //  res.render('home',{title: "I am ... (in bits and bytes)", date: date,role:"cons"});
 //});
 
+// formulário registar utilizador
+router.get('/administration/users/register', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  res.render('registarUser',{title: "Adicionar Item", date: date, role: req.session.level, username: req.session.user});
+});
+
+// post do formulário de registo
+router.post('/administration/users/register', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  req.body.user = req.session.user;
+  req.body.token = req.session.token;
+  axios.post('http://localhost:3002/users', req.body, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.redirect('/administration/users');
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao registar utilizador", error: error});
+  });
+});
+
+// formulário editar utilizador
+router.get('/administration/users/edit/:id', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  axios.get(`http://localhost:3002/users/${req.params.id}`, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.render('editarUser',{title: "Editar Utilizador", date: date, user: resp.data.data, role: req.session.level, username: req.session.user, token: req.session.token});
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao ler utilizador", error: error});
+  });
+});
+
+// post do formulário de editar utilizador
+router.post('/administration/users/edit/:id', function(req, res, next) {
+  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  req.body.user = req.session.user;
+  req.body.token = req.session.token;
+  console.log(req.body)
+  axios.put(`http://localhost:3002/users/${req.params.id}`, req.body, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.redirect('/administration/users');
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao editar utilizador", error: error});
+  });
+});
+
+// eliminar utilizador
+router.get('/administration/users/remove/:id', function(req, res, next) {
+  axios.delete(`http://localhost:3002/users/${req.params.id}`, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.redirect('/administration/users');
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao editar utilizador", error: error});
+  });
+});
+
+// listagem de utilizadores
 router.get('/administration/users', function(req, res, next) {
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
   axios.get(`http://localhost:3002/users`, {
@@ -276,7 +343,7 @@ router.get('/login', function(req, res, next) {
 });
 
 router.post('/login', function(req, res, next) {
-  if(req.body.username=="ADMIN"){
+  if(req.body.username=="admin"){
     req.body.level = 1;
   }
   else{
@@ -286,7 +353,8 @@ router.post('/login', function(req, res, next) {
     req.session.user = req.body.username;
     req.session.level = req.body.level;
     req.session.token = resp.data.token;
-    res.redirect('/');
+    if (req.session.level == 1) res.redirect('/administration/users');
+    else res.redirect('/');
   }).catch(function (error) {
     req.session.loginError = "Erro no login: " + (error.response?.data?.message || "Tente novamente.");
     res.redirect('/login');

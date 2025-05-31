@@ -10,7 +10,7 @@ module.exports.list = () => {
 
 module.exports.getUser = (id) => {
     return User
-        .findById(id)
+        .findOne({username: id})
         .exec()
 }
 
@@ -19,9 +19,15 @@ module.exports.addUser = (user) => {
     return userDb.save()
 }
 
-module.exports.updateUser = (id, data) => {
-    return User
-        .findByIdAndUpdate(id, data, {new: true})
+module.exports.updateUser = async (id, data) => {
+    var user = await User.findOne({username: id}).exec()
+    if (data.password && data.password.trim() != "") {
+        await user.setPassword(data.password)
+        await user.save()
+    }
+    delete data.password
+    return await User
+        .findByIdAndUpdate(user._id, data, {new: true})
         .exec()
 }
 
@@ -31,15 +37,16 @@ module.exports.updateUserStatus = (id, status) => {
         .exec()
 }
 
-module.exports.updateUserPassword = (id, passport) => {
-    return User
-        .findByIdAndUpdate(id, {password: password}, {new: true})
-        .exec()
+module.exports.updateUserPassword = async (id, password) => {
+    var user = await User.findOne({username: id}).exec()
+    await user.setPassword(password)
+    return user.save()
 }
 
-module.exports.deleteUser = (id) => {
-    return User
-        .findByIdAndDelete(id, {new: true})
+module.exports.deleteUser = async (id) => {
+    var user = await User.findOne({username: id}).exec()
+    return await User
+        .findByIdAndDelete(user._id, {new: true})
         .exec()
 }
 

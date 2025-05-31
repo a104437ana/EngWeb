@@ -6,7 +6,7 @@ block content
             .w3-bar-item.w3-left
                 img(src="/images/users.png", style="height:50px;" )
                 span  Utilizadores
-            a.w3-bar-item.w3-right.w3-hover-text-blue(href="/users/adicionar",, style="text-decoration: none;")
+            a.w3-bar-item.w3-right.w3-hover-text-blue(href="/administration/users/register",, style="text-decoration: none;")
                 img(src="/images/add.png", style="height:50px;" )
                 span  Adicionar Utilizador
         p
@@ -21,12 +21,13 @@ block content
                 th Remover
             each user in users
                 tr
-                    td=user.username
+                    td
+                        a(href="/users?user=" + user.username)=user.username
                     td=user.name
                     td=user.level
                     td=user.active
                     td=user.dateCreated
                     td
-                        a(href="/users/editar/" + user.username) Editar
+                        a(href="/administration/users/edit/" + user.username) Editar
                     td
-                        a(href="/users/remover/" + user.username) Remover
+                        a(href="/administration/users/remove/" + user.username) Remover
