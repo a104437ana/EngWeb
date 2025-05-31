@@ -5,6 +5,7 @@ const session = require('express-session');
 const multer = require('multer');
 const upload = multer();
 const FormData = require('form-data');
+const file = require('../../API_de_dados/models/file');
 
 function now() {
   return new Date().toLocaleString('pt-PT', { hour12: false });
@@ -234,7 +235,6 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
   const date = new Date().toLocaleString('pt-PT', { hour12: false });
   try {
     let filesData = [];
-
     if (req.body.files && Array.isArray(req.body.files)) {
       filesData = req.body.files;
     } else {
@@ -248,7 +248,8 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
       files: filesData.map(f => ({
         id: f.id,
         title: f.title,
-        classification: f.classification
+        tags: f.tags,
+        delete: f.delete
       }))
     }, {
       headers: {
@@ -257,7 +258,6 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
       }
     });
     for (const file of req.files) {
-      // file.fieldname é algo tipo "files[0][file]"
       const match = file.fieldname.match(/files\[(\d+)\]\[file\]/);
       if (match) {
         const index = parseInt(match[1], 10);
@@ -266,7 +266,6 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
         }
       }
     }
-    console.log(filesData);
     for (const file of filesData) {
       if (file.file) {
         const formData = new FormData();
@@ -278,7 +277,43 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
           }
         });
       }
+        }
+    let newFiles = [];
+
+    if (req.body.newFiles && Array.isArray(req.body.newFiles)) {
+      newFiles = req.body.newFiles;
+    } else {
+      newFiles = parseFilesFromBody(req.body, req.files, true); // Supondo que você tenha função para isso
     }
+
+    // Atribuir os arquivos correspondentes de req.files aos newFiles
+    for (const file of req.files) {
+      const match = file.fieldname.match(/newFiles\[(\d+)\]\[file\]/);
+      if (match) {
+        const index = parseInt(match[1], 10);
+        if (newFiles[index]) {
+          newFiles[index].file = file;
+        }
+      }
+    }
+
+    // Substituir req.newFiles pelo newFiles que acabamos de montar
+    for (const file of newFiles) {
+      if (file.file) {
+        const formData = new FormData();
+        formData.append('file', file.file.buffer, file.file.originalname);
+        formData.append('title', String(file.title || ''));
+        formData.append('tags', JSON.stringify(file.tags || []));
+        formData.append('public', String(req.body.public === 'true' || req.body.public === true));
+        await axios.put(`http://localhost:3001/upload/addFile/${req.params.id}`, formData, {
+          headers: {
+            ...formData.getHeaders(),
+            Authorization: `Bearer ${req.session.token}`
+          }
+        });
+      }
+    }
+
     if (req.session.level == 1) {
       res.redirect(`/users?user=${req.session.currentDiary}`);
     } else {

@@ -38,13 +38,6 @@ async function checkManifestFolder(zip, manifest, path){
       throw new Error("Manifesto não está de acordo com os ficheiros existentes");
     }
   }
-  if (manifest.directories?.directory) {
-    let subfolders = manifest.directories.directory;
-    if (!Array.isArray(subfolders)) subfolders = [subfolders];
-    for (const subfolder of subfolders) {
-      await checkManifestFolder(zip, subfolder, path + "/" + subfolder.folder_name);
-    }
-  }
 }
 
 async function saveMetadata(zip, manifest, path, user, public){
@@ -53,25 +46,17 @@ async function saveMetadata(zip, manifest, path, user, public){
   const file_ids_res = []
   for (const element of files) {
     const filename = element.filename;
+    let tags = element.tags?.tag || [];
     const file = {
       path: path + filename,
       title: element.title,
       type: element.type,
-      classification: element.classification,
+      tags: tags,
       uploaded_by : user,
       public : public
     };
     const f = await File.save(file);
     file_ids_res.push(f._id);
-  }
-  if (manifest.directories?.directory) {
-    let subfolders = manifest.directories.directory;
-    if (!Array.isArray(subfolders)) subfolders = [subfolders];
-    for (const subfolder of subfolders) {
-      const subfolderPath = path + subfolder.folder_name + '/';
-      const files = await saveMetadata(zip, subfolder, subfolderPath, user, public);
-      file_ids_res.push(...files);
-    }
   }
   return file_ids_res;
 }
@@ -94,12 +79,11 @@ async function saveZipFiles(zip, manifest, zipFolderPath, outputFolderPath) {
       throw new Error("Erro ao criar ficheiro " + filename);
     }
   }
-  if (manifest.directories?.directory) {
-    let subfolders = manifest.directories.directory;
-    if (!Array.isArray(subfolders)) subfolders = [subfolders];
-    for (const subfolder of subfolders) {
-      await saveZipFiles(zip, subfolder, zipFolderPath + '/' + subfolder.folder_name, fullOutputPath);
-    }
+}
+
+async function removeFile(filePath) {
+  if (fs.existsSync(filePath)) {
+    await fs.promises.unlink(filePath);
   }
 }
 
@@ -145,7 +129,7 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
           id: f_id,
           title: file.title,
           type: file.type,
-          classification: file.classification,
+          tags: file.tags,
           uploaded_by : file.uploaded_by,
           public : file.public
         });
@@ -168,7 +152,7 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
           id: f_id,
           title: file.title,
           type: file.type,
-          classification: file.classification,
+          tags: file.tags,
           uploaded_by : file.uploaded_by,
           public : file.public
         });
@@ -190,7 +174,7 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
           id: f_id,
           title: file.title,
           type: file.type,
-          classification: file.classification,
+          tags: file.tags,
           uploaded_by : file.uploaded_by,
           public : file.public
         });
@@ -227,25 +211,72 @@ router.post('/', upload.single('file'), Auth.validate, async function(req, res, 
   }
 });
 
+async function insertFile(filePath, fileBuffer, name) {
+  const ext = path.extname(name).toLowerCase();
+  if (['.apng', '.gif', '.ico', '.cur', '.png', '.jpeg', '.jpg', '.jfif', '.pjpeg', '.pjp', '.svg'].includes(ext)) {
+    type = 'image';
+  } else if (ext === '.pdf') {
+    type = 'pdf';
+  } else if (ext === '.txt') {
+    type = 'text';
+  } else {
+    type = 'other';
+  }
+  const newFilePath = `${filePath}/${name}${ext}`;
+  await fs.promises.writeFile(newFilePath, fileBuffer);
+  return {
+    'path': newFilePath,
+    'type': type
+  };
+}
+
+router.put('/addFile/:id', Auth.validateChangeUpload, multer().single('file'),async function(req, res, next) {
+  try {
+    const upload = await Upload.findById(req.params.id);
+    var file = req.file;
+    const f_id = await File.insert({
+          title: req.body.title,
+          tags : req.body.tags,
+          uploaded_by : upload.uploaded_by,
+          public : upload.public
+    })
+    const new_info = await insertFile(upload.path, file.buffer, file.originalname);
+    await File.updateInfo(f_id, new_info);
+    const u = await Upload.addFile(req.params.id, f_id);
+    return res.status(200).json(u);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+
 router.put('/:id', Auth.validateChangeUpload, async function(req, res, next) {
   try {
-    console.log(req.body)
     const date = new Date().toISOString();
-    const upload = await Upload.update(req.params.id, {
-      description: req.body.description,
-      public: req.body.public === 'true'
-    });
+    const file_ids = []
     if (req.body.files) {
       const files = Array.isArray(req.body.files) ? req.body.files : Object.values(req.body.files);
       for (const file of files) {
         if (file.id) {
-          await File.update(file.id, {
-            title: file.title,
-            classification: file.classification
-          });
+          if (file.delete == 'false'){
+            file_ids.push(file.id);
+            await File.update(file.id, {
+              title: file.title,
+              tags: file.tags
+            });
+          }
+          else{
+            path = await File.delete(file.id);
+            await removeFile(path);
+          }
         }
       }
     }
+    const upload = await Upload.update(req.params.id, {
+      description: req.body.description,
+      public: req.body.public === 'true',
+      files : file_ids
+    });
     logStream.write(`${date}:\n Upload ${upload._id} alterado pelo utilizador ${req.user}\n`);
     return res.status(200).json(upload);
   } catch (error) {

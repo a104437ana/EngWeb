@@ -46,9 +46,13 @@ module.exports.update = async (id, data) => {
         uploaded_by : old.uploaded_by,
         public : data.public,
         description : data.description,
-        files : old.files
+        files : data.files
     }
     return Upload
         .findByIdAndUpdate(id, upload, {new : true})
         .exec()
+}
+
+module.exports.addFile = async (id, f_id) => {
+    return await Upload.findByIdAndUpdate(id, { $push: { files: f_id } }, { new: true }).exec();
 }

@@ -1,33 +1,182 @@
 extends layout
 
 block content
-    .w3-container.w3-padding-16
-        img(src="/images/diary.png", style="height:50px;" )
-        span  Editar upload:
-            span=upload.upload_date
-    form.w3-container.w3-card.w3-white.w3-round(method="POST" enctype="multipart/form-data")
+  .w3-container.w3-padding-16
+    img(src="/images/diary.png", style="height:50px;")
+    span Editar upload:
+      span= upload.upload_date
+
+  form.w3-container.w3-card.w3-white.w3-round(method="POST" enctype="multipart/form-data")
+    label
+      h2.w3-bar-item.w3-left Descrição:
+    input.w3-input.w3-border.w3-round(type="text", name="description", value=upload.description)
+
+    label
+      h2.w3-bar-item.w3-left Público:
+    input.w3-check(type="checkbox", name="public", checked=upload.public, value="true")
+
+    ul.w3-ul
+      each file, i in upload.files
+        li.w3-content.w3-card-4.w3-white.w3-round(style="position: relative;")
+          input(type="hidden", name=`files[${i}][id]`, value=file.id)
+          input(type="hidden", name=`files[${i}][delete]`, value="false" class="delete-flag")
+
+          button.delete-file-btn.w3-button.w3-red.w3-small(type="button", data-index=i, style="position: absolute; top: 10px; right: 10px;") 🗑️
+
+          label
+            h2.w3-bar-item.w3-left Título:
+          input.w3-input.w3-border.w3-round(type="text", name=`files[${i}][title]`, value=file.title)
+
+          main.w3-container.w3-margin-bottom
+            label
+              h3.w3-bar-item.w3-left Tags:
+
+            .w3-container(data-index=i)
+              .tag-container(data-name=`files[${i}][tags][]`)
+                each tag in file.tags
+                  span.w3-tag.w3-round.w3-margin-right(style="display: inline-flex; align-items: center; gap: 6px;")
+                    span= tag
+                    button.remove-tag-btn(type="button", data-tag=tag, style="background: transparent; border: none; cursor: pointer; color: white;") ✕
+                each tag in file.tags
+                  input(type="hidden", name=`files[${i}][tags][]`, value=tag)
+
+              .w3-margin-top
+                input.add-tag-input.w3-input.w3-border.w3-round(type="text", placeholder="Nova tag")
+                button.add-tag-btn.w3-button.w3-small.w3-green(type="button") +
+
+            if file.type === 'image'
+              img(src=`/file/${file.id}`, alt=file.title, style="width:900px;height:auto;")
+            else if file.type === 'pdf'
+              iframe(src=`/file/${file.id}`, width="900px", height="auto")
+
+            label Alterar ficheiro
+            input.w3-input.w3-border.w3-round(type="file", name=`files[${i}][file]`)
+          br
+
+    //- NOVOS FICHEIROS
+    h3.w3-margin-top.w3-text-indigo Adicionar novos ficheiros
+    #new-files-container
+    button#add-new-file-btn.w3-button.w3-green.w3-margin-top(type="button") + Novo ficheiro
+
+    button.w3-button.w3-medium.w3-cyan.w3-text-black.w3-hover-cyan.w3-hover-text-black.w3-block(type="submit") Editar
+
+  //- Template para novos ficheiros
+  template#new-file-template
+    li.w3-content.w3-card-4.w3-white.w3-round(data-index="__INDEX__")
+      input(type="hidden", name="newFiles[__INDEX__][new]", value="true")
+
+      label
+        h2.w3-bar-item.w3-left Título:
+      input.w3-input.w3-border.w3-round(type="text", name="newFiles[__INDEX__][title]")
+
+      main.w3-container.w3-margin-bottom
         label
-            h2.w3-bar-item.w3-left Descrição:
-        input.w3-input.w3-border.w3-round(type="text" name="description" value=upload.description)
-        label
-            h2.w3-bar-item.w3-left Público:
-        input.w3-input.w3-border.w3-round(type="checkbox" name="public" checked=(upload.public) value='true')
-        ul.w3-ul
-            each file, i in upload.files
-                li.w3-content.w3-card-4.w3-white.w3-round(style="position: relative;")
-                    input(type="hidden" name="files[" + i + "][id]" value=file.id)
-                    label
-                        h2.w3-bar-item.w3-left Título:
-                    input.w3-input.w3-border.w3-round(type="text" name="files[" + i + "][title]" value=file.title)
-                    main.w3-container.w3-margin-bottom
-                        label
-                            h3.w3-bar-item.w3-left Classificação:
-                        input.w3-input.w3-border.w3-round(type="text" name="files[" + i + "][classification]" value=file.classification)
-                        if file.type === 'image'
-                            img(src=`/file/${file.id}`, alt=file.title, style="width:900px;height:auto;")
-                        else if file.type === 'pdf'
-                            iframe(src=`/file/${file.id}`, width='900px', height='auto')
-                        label Alterar ficheiro
-                        input.w3-input.w3-border.w3-round(type="file" name="files[" + i + "][file]")
-                    br
-        button.w3-button.w3-medium.w3-cyan.w3-text-black.w3-hover-cyan.w3-hover-text-black.w3-block(type="submit") Editar
+          h3.w3-bar-item.w3-left Tags:
+
+        .w3-container
+          .tag-container(data-name="newFiles[__INDEX__][tags][]")
+          .w3-margin-top
+            input.add-tag-input.w3-input.w3-border.w3-round(type="text", placeholder="Nova tag")
+            button.add-tag-btn.w3-button.w3-small.w3-green(type="button") +
+
+        label Escolher ficheiro
+        input.w3-input.w3-border.w3-round(type="file", name="newFiles[__INDEX__][file]")
+
+  //- Script
+  script.
+    document.addEventListener('DOMContentLoaded', function () {
+      // TAGS
+      function setupTagManagement(container) {
+        const tagContainer = container.querySelector('.tag-container');
+        const inputField = container.querySelector('.add-tag-input');
+        const addBtn = container.querySelector('.add-tag-btn');
+
+        const getHiddenInputs = () => container.querySelectorAll('input[type="hidden"][name$="tags][]"]');
+        const getCurrentTags = () => Array.from(getHiddenInputs()).map(input => input.value);
+        const addHiddenInput = (value) => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = tagContainer.getAttribute('data-name');
+          input.value = value;
+          container.appendChild(input);
+        };
+        const createTagElement = (tag) => {
+          const span = document.createElement('span');
+          span.className = 'w3-tag w3-round w3-margin-right';
+          span.style.display = 'inline-flex';
+          span.style.alignItems = 'center';
+          span.style.gap = '6px';
+          const tagText = document.createElement('span');
+          tagText.textContent = tag;
+          const btn = document.createElement('button');
+          btn.textContent = '✕';
+          btn.className = 'remove-tag-btn';
+          btn.setAttribute('type', 'button');
+          btn.setAttribute('data-tag', tag);
+          btn.style.background = 'transparent';
+          btn.style.border = 'none';
+          btn.style.cursor = 'pointer';
+          btn.style.color = 'white';
+          span.appendChild(tagText);
+          span.appendChild(btn);
+          tagContainer.appendChild(span);
+        };
+        addBtn.addEventListener('click', () => {
+          const newTag = inputField.value.trim();
+          if (!newTag) return;
+          const currentTags = getCurrentTags();
+          if (currentTags.includes(newTag)) {
+            inputField.value = '';
+            return;
+          }
+          createTagElement(newTag);
+          addHiddenInput(newTag);
+          inputField.value = '';
+        });
+        tagContainer.addEventListener('click', (e) => {
+          if (e.target.classList.contains('remove-tag-btn')) {
+            const tagToRemove = e.target.getAttribute('data-tag');
+            const span = e.target.parentElement;
+            span.remove();
+            getHiddenInputs().forEach(input => {
+              if (input.value === tagToRemove) input.remove();
+            });
+          }
+        });
+      }
+
+      document.querySelectorAll('.w3-container[data-index]').forEach(container => {
+        setupTagManagement(container);
+      });
+      document.querySelectorAll('.delete-file-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const index = btn.getAttribute('data-index');
+          const fileBlock = btn.closest('li');
+          const deleteInput = fileBlock.querySelector(`input[name="files[${index}][delete]"]`);
+          if (deleteInput) deleteInput.value = 'true';
+          fileBlock.style.display = 'none';
+        });
+      });
+      let newFileIndex = 0;
+      const newFilesContainer = document.getElementById('new-files-container');
+      const addNewBtn = document.getElementById('add-new-file-btn');
+      const template = document.getElementById('new-file-template');
+
+      addNewBtn.addEventListener('click', () => {
+        const clone = template.content.cloneNode(true);
+        const html = clone.querySelector('li');
+
+        html.setAttribute('data-index', newFileIndex);
+        html.querySelectorAll('[name]').forEach(el => {
+          el.name = el.name.replace(/__INDEX__/g, newFileIndex);
+        });
+        html.querySelectorAll('[data-name]').forEach(el => {
+          el.setAttribute('data-name', el.getAttribute('data-name').replace(/__INDEX__/g, newFileIndex));
+        });
+
+        newFilesContainer.appendChild(clone);
+        setupTagManagement(newFilesContainer.lastElementChild);
+
+        newFileIndex++;
+      });
+    });

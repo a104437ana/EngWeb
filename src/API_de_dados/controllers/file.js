@@ -1,3 +1,4 @@
+const { files } = require('jszip')
 var File = require('../models/file')
 
 module.exports.findAll = () => {
@@ -21,6 +22,7 @@ module.exports.delete = async (id) => {
     var file = await File
         .findByIdAndDelete(id, {new : true})
         .exec()
+    return file.path
 }
 
 module.exports.update = async (id, data, public) => {
@@ -29,7 +31,7 @@ module.exports.update = async (id, data, public) => {
         path : old.path,
         title : data.title,
         type : old.type,
-        classification : data.classification,
+        tags : data.tags,
         uploaded_by : old.uploaded_by,
         public : public
     }
@@ -44,11 +46,24 @@ module.exports.updateInfo = async (id, info) => {
         path : info.path,
         title : old.title,
         type : info.type,
-        classification : old.classification,
+        tags : old.tags,
         uploaded_by : old.uploaded_by,
         public : old.public
     }
     return File
         .findByIdAndUpdate(id, file, {new : true})
         .exec()
+}
+
+module.exports.insert = async (file) => {
+    var fileDB = new File({
+        path : "",
+        title : file.title,
+        type : "",
+        tags : file.tags,
+        uploaded_by : file.uploaded_by,
+        public : file.public
+    })
+    const f = await fileDB.save();
+    return f._id;
 }

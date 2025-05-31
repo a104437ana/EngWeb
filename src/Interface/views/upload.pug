@@ -16,7 +16,9 @@ block content
                     header.w3-container.w3-light-grey.w3-bar
                         h2.w3-bar-item.w3-left=file.title
                     main.w3-container.w3-margin-bottom
-                        h3=file.classification
+                        div.w3-container
+                            each tag in file.tags 
+                                span.w3-tag.w3-round.w3-margin-right(style="display: inline-flex; align-items: center; gap: 6px;")=tag
                         if file.type === 'image'
                             img(src=`/file/${file.id}`, alt=file.title, style="width:900px;height:auto;")
                         else if file.type === 'pdf'

@@ -4,7 +4,7 @@ var fileSchema = new mongoose.Schema({
     path : String,
     title : String,
     type : String,
-    classification : String,
+    tags : [String],
     uploaded_by : String,
     public : Boolean
 }, {versionKey : false})
