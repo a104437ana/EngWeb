@@ -274,7 +274,7 @@ router.put('/:id', Auth.validateChangeUpload, async function(req, res, next) {
     }
     const upload = await Upload.update(req.params.id, {
       description: req.body.description,
-      public: req.body.public === 'true',
+      public: req.body.public,
       files : file_ids
     });
     logStream.write(`${date}:\n Upload ${upload._id} alterado pelo utilizador ${req.user}\n`);

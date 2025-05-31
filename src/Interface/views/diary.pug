@@ -5,6 +5,7 @@ block content
         h1.w3-bar
             .w3-bar-item.w3-left
                 img(src="/images/diary.png", style="height:50px;" )
+                span=`Diário de ${user}` 
         ul.w3-ul
             each entry in diary
                 li.w3-content.w3-card-4.w3-white.w3-round(style="position: relative;")

@@ -150,7 +150,7 @@ router.get('/users', (req, res) => {
       Authorization: `Bearer ${req.session.token}`
     }
   }).then(resp => {
-    res.render('diary',{title: `Diário de ${user}`, date: date, diary: resp.data, role: req.session.level, username: req.session.user});
+    res.render('diary',{title: `Diário de ${user}`, date: date, diary: resp.data, role: req.session.level, username: req.session.user, user:user});
   }).catch(function (error) {
     res.render('error',{title: "Erro", date: date, message : "Erro ao ler o diário", error: error});
   });
@@ -283,10 +283,8 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
     if (req.body.newFiles && Array.isArray(req.body.newFiles)) {
       newFiles = req.body.newFiles;
     } else {
-      newFiles = parseFilesFromBody(req.body, req.files, true); // Supondo que você tenha função para isso
+      newFiles = parseFilesFromBody(req.body, req.files, true); 
     }
-
-    // Atribuir os arquivos correspondentes de req.files aos newFiles
     for (const file of req.files) {
       const match = file.fieldname.match(/newFiles\[(\d+)\]\[file\]/);
       if (match) {
@@ -296,8 +294,6 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
         }
       }
     }
-
-    // Substituir req.newFiles pelo newFiles que acabamos de montar
     for (const file of newFiles) {
       if (file.file) {
         const formData = new FormData();
