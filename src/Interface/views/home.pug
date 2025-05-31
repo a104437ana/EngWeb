@@ -2,6 +2,9 @@ extends layout
 
 block content
   .w3-container.w3-padding-32.w3-center
+    if error
+      .w3-panel.w3-pale-red.w3-border.w3-border-red.w3-round
+        p #{error}
     h1 
       b O Meu Eu Digital
     p 

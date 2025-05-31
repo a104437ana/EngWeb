@@ -15,7 +15,9 @@ function now() {
 router.get('/', function(req, res, next) {
   delete req.session.currentDiary;
   var date = new Date().toLocaleString('pt-PT', { hour12: false });
-  res.render('home',{title: "O Meu Eu Digital", date: date, role: req.session.level, username: req.session.user});
+  const errorMsg = req.session.searchError;
+  delete req.session.searchError;
+  res.render('home',{title: "O Meu Eu Digital", date: date, role: req.session.level, username: req.session.user, error: errorMsg});
 });
 
 //router.get('/home', function(req, res, next) {
@@ -158,6 +160,7 @@ router.get('/users', async (req, res) => {
     });
   }
   else{
+    req.session.searchError = "Utilizador não existe";
     return res.redirect('/');
   }
 });
