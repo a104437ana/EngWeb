@@ -15,6 +15,10 @@ var upload = multer({dest: 'upload/'})
 
 var logStream = fs.createWriteStream(path.join(__dirname, '/../', 'logs.txt'), { flags: 'a' })
 
+function now() {
+  return new Date().toLocaleString('pt-PT', { hour12: false });
+}
+
 async function readManifest(zipPath){
   try{
       const zipData = fs.readFileSync(zipPath);
@@ -90,7 +94,7 @@ async function removeFile(filePath) {
 }
 
 router.get('/diary/:id', Auth.validateGetUserDiary, async function(req, res, next) {
-  date = new Date().toISOString();
+  var date = now();
   if(req.level=="USER"){
     if(req.user==req.params.id){
       const diary = await Upload.allUserUploads(req.params.id);
@@ -116,7 +120,7 @@ router.get('/diary/:id', Auth.validateGetUserDiary, async function(req, res, nex
 });
 
 router.get('/download/:id', Auth.validateGetUpload, async function(req, res, next) {
-  date = new Date().toISOString();
+  var date = now();
   if(req.level=="USER"){
       const upload = await Upload.findById(req.params.id);
       if (!upload) return res.status(404).json({ error: 'Upload não encontrado'});
@@ -231,7 +235,7 @@ router.get('/download/:id', Auth.validateGetUpload, async function(req, res, nex
 });
 
 router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
-  date = new Date().toISOString();
+  var date = now();
   if(req.level=="USER"){
       const upload = await Upload.findById(req.params.id);
       const upload_info = {
@@ -310,7 +314,7 @@ router.post('/', upload.single('file'), Auth.validate, async function(req, res, 
     const file_ids = await saveMetadata(zip, manifestData, __dirname + '/../public/fileStore/' + manifestData.folder_name + '/', req.body.user, manifestData.public);
     var upload = {
       path : __dirname + '/../public/fileStore/' + manifestData.folder_name + '/',
-      upload_date : new Date().toISOString(),
+      upload_date : now(),
       uploaded_by : req.body.user,
       public : manifestData.public,
       description : manifestData.description,
@@ -369,7 +373,7 @@ router.put('/addFile/:id', Auth.validateChangeUpload, multer().single('file'),as
 
 router.put('/:id', Auth.validateChangeUpload, async function(req, res, next) {
   try {
-    const date = new Date().toISOString();
+    var date = now();
     const file_ids = []
     if (req.body.files) {
       const files = Array.isArray(req.body.files) ? req.body.files : Object.values(req.body.files);
@@ -404,7 +408,7 @@ router.put('/:id', Auth.validateChangeUpload, async function(req, res, next) {
 
 router.delete('/:id', Auth.validateChangeUpload, async function(req, res, next) {
   try {
-    date = new Date().toISOString();
+    var date = now();
     const upload = await Upload.delete(req.params.id);
     await fs.promises.rm(upload.path, { recursive: true , force : true})
     logStream.write(`${date}:\n Upload ${upload._id} apagado pelo utilizador ${req.user}\n`)

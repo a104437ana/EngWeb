@@ -43,7 +43,7 @@ router.post('/administration/users/register', function(req, res, next) {
 
 // formulário editar utilizador
 router.get('/administration/users/edit/:id', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   axios.get(`http://localhost:3002/users/${req.params.id}`, {
     headers: {
       Authorization: `Bearer ${req.session.token}`
@@ -57,7 +57,7 @@ router.get('/administration/users/edit/:id', function(req, res, next) {
 
 // post do formulário de editar utilizador
 router.post('/administration/users/edit/:id', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   req.body.user = req.session.user;
   req.body.token = req.session.token;
   console.log(req.body)
@@ -87,7 +87,7 @@ router.get('/administration/users/remove/:id', function(req, res, next) {
 
 // listagem de utilizadores
 router.get('/administration/users', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   axios.get(`http://localhost:3002/users`, {
     headers: {
       Authorization: `Bearer ${req.session.token}`
@@ -129,7 +129,7 @@ router.get('/users', async (req, res) => {
   if (!user) {
     return res.redirect('/');
   }
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   const exists = await axios.get(`http://localhost:3002/users/exists/${user}`);
   if(exists.data.data==true){
     req.session.currentDiary = user;
@@ -151,7 +151,7 @@ router.get('/users', async (req, res) => {
 
 router.get('/myDiary', function(req, res, next) {
   req.session.currentDiary = req.session.user;
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   axios.get(`http://localhost:3001/upload/diary/${req.session.user}`, {
     headers: {
       Authorization: `Bearer ${req.session.token}`
@@ -184,7 +184,7 @@ router.get('/uploads/download/:id', async function(req, res, next) {
 });
 
 router.get('/uploads/delete/:id', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   axios.delete(`http://localhost:3001/upload/${req.params.id}`, {
     headers: {
       Authorization: `Bearer ${req.session.token}`
@@ -203,7 +203,7 @@ router.get('/uploads/delete/:id', function(req, res, next) {
 
 
 router.get('/uploads/edit/:id', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   axios.get(`http://localhost:3001/upload/${req.params.id}`, {
     headers: {
       Authorization: `Bearer ${req.session.token}`
@@ -245,7 +245,7 @@ function parseFilesFromBody(body, files) {
 
 
 router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
-  const date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   try {
     let filesData = [];
     if (req.body.files && Array.isArray(req.body.files)) {
@@ -339,7 +339,7 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
 });
 
 router.get('/uploads/:id', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   axios.get(`http://localhost:3001/upload/${req.params.id}`, {
     headers: {
       Authorization: `Bearer ${req.session.token}`
@@ -352,12 +352,12 @@ router.get('/uploads/:id', function(req, res, next) {
 });
 
 router.get('/registar', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   res.render('registar',{title: "Adicionar Item", date: date, role: req.session.level, username: req.session.user});
 });
 
 router.post('/registar', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   req.body.user = req.session.user;
   req.body.token = req.session.token;
   axios.post('http://localhost:3001/upload/', req.body, {
@@ -380,7 +380,7 @@ router.get('/logout', function(req, res, next) {
 });
 
 router.get('/login', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   const errorMsg = req.session.loginError;
   delete req.session.loginError;
   res.render('login',{title: "Log in", date: date, error: errorMsg});
@@ -406,7 +406,7 @@ router.post('/login', function(req, res, next) {
 });
 
 router.get('/signup', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   const errorMsg = req.session.signupError;
   delete req.session.signupError;
   res.render('signup', {title: "Sign up", date: date, error: errorMsg });

@@ -6,8 +6,12 @@ var path = require('path');
 var Auth = require('../auth/auth')
 var fs = require('fs');
 
+function now() {
+  return new Date().toLocaleString('pt-PT', { hour12: false });
+}
+
 router.get('/:id', Auth.validateGetFile, async function(req, res, next) {
-  date = new Date().toISOString();
+  var date = now();
   const file = await File.findById(req.params.id);
   if (!file) return res.status(404).send('Ficheiro não encontrado');
   const filePath = path.resolve(file.path);
