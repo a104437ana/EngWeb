@@ -215,12 +215,18 @@ router.get('/uploads/edit/:id', function(req, res, next) {
   });
 });
 
-function parseFilesFromBody(body, files) {
+function parseFilesFromBody(body, files, newFiles) {
   const result = [];
   const fileMap = {};
   if (files) {
     for (const f of files) {
-      const match = f.fieldname.match(/^files\[(\d+)]\[file]$/);
+      var match;
+      if(newFiles){
+        f.fieldname.match(/^newFiles\[(\d+)\]\[file]$/);
+      }
+      else{
+        match = f.fieldname.match(/^files\[(\d+)]\[file]$/);
+      }
       if (match) {
         const index = parseInt(match[1]);
         fileMap[index] = f;
@@ -228,7 +234,13 @@ function parseFilesFromBody(body, files) {
     }
   }
   Object.keys(body).forEach(key => {
-    const match = key.match(/^files\[(\d+)]\[(\w+)]$/);
+    var match;
+    if(newFiles){
+      match = key.match(/^newFiles\[(\d+)]\[(\w+)]$/);
+    }
+    else{
+      match = key.match(/^files\[(\d+)]\[(\w+)]$/);
+    }
     if (match) {
       const index = parseInt(match[1]);
       const prop = match[2];
