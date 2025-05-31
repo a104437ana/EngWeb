@@ -93,6 +93,21 @@ async function removeFile(filePath) {
   }
 }
 
+router.get('/stats', Auth.validateAdmin, async function(req, res, next) {
+  const logFilePath = path.join(__dirname, '/../', 'logs.txt');
+  const uploadStats = await Upload.getStats();
+  fs.readFile(logFilePath, 'utf8', function(err, data) {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao ler o ficheiro de logs' });
+    }
+    const info = {
+      logs: data,
+      estatisticas: uploadStats
+    };
+    return res.status(200).json(info);
+  });
+});
+
 router.get('/diary/:id', Auth.validateGetUserDiary, async function(req, res, next) {
   var date = now();
   if(req.level=="USER"){
@@ -123,6 +138,7 @@ router.get('/download/:id', Auth.validateGetUpload, async function(req, res, nex
   var date = now();
   if(req.level=="USER"){
       const upload = await Upload.findById(req.params.id);
+      await Upload.addDownload(req.params.id);
       if (!upload) return res.status(404).json({ error: 'Upload não encontrado'});
       const zipFilename = `upload_${upload._id}.zip`;
       res.set({
@@ -160,6 +176,7 @@ router.get('/download/:id', Auth.validateGetUpload, async function(req, res, nex
   }
   else if (req.level=="ADMIN"){
       const upload = await Upload.findById(req.params.id);
+      await Upload.addDownload(req.params.id);
       if (!upload) return res.status(404).json({ error: 'Upload não encontrado'});
       const zipFilename = `upload_${upload._id}.zip`;
       res.set({
@@ -197,6 +214,7 @@ router.get('/download/:id', Auth.validateGetUpload, async function(req, res, nex
   }
   else{
       const upload = await Upload.findById(req.params.id);
+      await Upload.addDownload(req.params.id);
       if (!upload) return res.status(404).json({ error: 'Upload não encontrado'});
       const zipFilename = `upload_${upload._id}.zip`;
       res.set({
@@ -238,6 +256,7 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
   var date = now();
   if(req.level=="USER"){
       const upload = await Upload.findById(req.params.id);
+      await Upload.addView(req.params.id);
       const upload_info = {
         upload_date : upload.upload_date,
         public : upload.public,
@@ -261,6 +280,7 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
   }
   else if (req.level=="ADMIN"){
       const upload = await Upload.findById(req.params.id);
+      await Upload.addView(req.params.id);
       const upload_info = {
         upload_date : upload.upload_date,
         public : upload.public,
@@ -283,6 +303,7 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
   }
   else{
       const upload = await Upload.findById(req.params.id);
+      await Upload.addView(req.params.id);
       const upload_info = {
         upload_date : upload.upload_date,
         public : upload.public,
@@ -314,11 +335,13 @@ router.post('/', upload.single('file'), Auth.validate, async function(req, res, 
     const file_ids = await saveMetadata(zip, manifestData, __dirname + '/../public/fileStore/' + manifestData.folder_name + '/', req.body.user, manifestData.public);
     var upload = {
       path : __dirname + '/../public/fileStore/' + manifestData.folder_name + '/',
-      upload_date : now(),
+      upload_date : new Date().toISOString(),
       uploaded_by : req.body.user,
       public : manifestData.public,
       description : manifestData.description,
-      files : file_ids
+      files : file_ids, 
+      views : 0,
+      downloads: 0
     }
     const data  = await Upload.save(upload);
     const baseZipPath = 'SIP'; 

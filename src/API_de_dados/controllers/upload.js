@@ -6,6 +6,15 @@ module.exports.findAll = () => {
         .exec()
 }
 
+module.exports.getStats = async () => {
+    var mostViewed= await Upload.find({}, '_id views').sort({views: -1}).exec();
+    var mostDownloaded= await Upload.find({}, '_id downloads').sort({downloads: -1}).exec();
+    return {
+        most_viewed : mostViewed.slice(0, 4),
+        most_downloaded : mostDownloaded.slice(0,4)
+    }
+}
+
 module.exports.findById = (id) => {
     return Upload
         .findById(id)
@@ -46,7 +55,9 @@ module.exports.update = async (id, data) => {
         uploaded_by : old.uploaded_by,
         public : data.public,
         description : data.description,
-        files : data.files
+        files : data.files,
+        views: old.views,
+        downloads: old.downloads
     }
     return Upload
         .findByIdAndUpdate(id, upload, {new : true})
@@ -55,4 +66,12 @@ module.exports.update = async (id, data) => {
 
 module.exports.addFile = async (id, f_id) => {
     return await Upload.findByIdAndUpdate(id, { $push: { files: f_id } }, { new: true }).exec();
+}
+
+module.exports.addView = async (id) => {
+    return await Upload.findByIdAndUpdate(id, { $inc: { views: 1 } }, { new: true }).exec();
+}
+
+module.exports.addDownload = async (id) => {
+    return await Upload.findByIdAndUpdate(id, { $inc: { downloads: 1 } }, { new: true }).exec();
 }

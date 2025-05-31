@@ -6,6 +6,8 @@ var uploadSchema = new mongoose.Schema({
     uploaded_by : String,
     public : Boolean,
     description : String,
+    views: Number,
+    downloads: Number,
     files : [String]
 }, {versionKey : false})
 

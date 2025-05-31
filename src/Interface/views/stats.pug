@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  .w3-row
+    .w3-col.m6
+      .w3-card
+        h1 Logs de Utilização
+        pre(style="max-height: 500px; overflow-y: auto; background-color: #f1f1f1; padding: 10px;")
+          each line in stats.logs.split('\n')
+            | #{line}
+            br
+    .w3-col.m6
+      .w3-card
+        h1 Estatísticas 
+        h3 Publicações mais vistas:
+        each upload in stats.estatisticas.most_viewed
+            p
+                | ID: 
+                a(href=`/uploads/${upload._id}`)= upload._id
+                |  – Visualizações: #{upload.views}
+        h3 Publicações mais descarregadas:
+        each upload in stats.estatisticas.most_downloaded
+            p
+                | ID: 
+                a(href=`/uploads/${upload._id}`)= upload._id
+                |  – Downloads: #{upload.downloads}

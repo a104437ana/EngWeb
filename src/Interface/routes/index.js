@@ -19,6 +19,19 @@ router.get('/', function(req, res, next) {
   res.render('home',{title: "O Meu Eu Digital", date: date, role: req.session.level, username: req.session.user, error: errorMsg});
 });
 
+router.get('/administration/stats', function(req, res, next) {
+  var date = now();
+  axios.get(`http://localhost:3001/upload/stats`, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.render('stats',{title: "Estatísticas", date: date, stats : resp.data, role: req.session.level, username: req.session.user, token: req.session.token});
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao ler estatísticas", error: error});
+  });
+});
+
 // formulário registar utilizador
 router.get('/administration/users/register', function(req, res, next) {
   var date = now();
@@ -98,11 +111,6 @@ router.get('/administration/users', function(req, res, next) {
     res.render('error',{title: "Erro", date: date, message : "Não foi possível aceder à página", error: error});
   });
 });
-
-//router.get('/stats', function(req, res, next) {
-//  var date = new Date().toLocaleString('pt-PT', { hour12: false });
-//  res.render('stats',{title: "Estatísticas", date: date,role:"admin"});
-//});
 
 router.get('/file/:id', async (req, res) => {
   const fileId = req.params.id;
@@ -409,8 +417,7 @@ router.post('/login', function(req, res, next) {
     req.session.user = req.body.username;
     req.session.level = req.body.level;
     req.session.token = resp.data.token;
-    if (req.session.level == 1) res.redirect('/administration/users');
-    else res.redirect('/');
+    res.redirect('/');
   }).catch(function (error) {
     req.session.loginError = "Erro no login: " + (error.response?.data?.message || "Tente novamente.");
     res.redirect('/login');

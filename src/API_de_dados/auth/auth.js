@@ -19,6 +19,31 @@ module.exports.validate = (req, res, next) => {
     }
 }
 
+module.exports.validateAdmin = (req, res, next) => {
+const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if(token){
+        jwt.verify(token, "EngWeb2025", async (err, payload) => {
+            if(err){
+                res.status(401).jsonp({error : "Utilizador não tem permissão para ver as estatísticas"})
+            }
+            else{
+                    if(payload.level == 1){
+                        req.level = "ADMIN"
+                        req.user = payload.username
+                        next()
+                    }
+                    else{
+                        res.status(401).jsonp({error : "Utilizador não tem permissão para ver as estatísticas"})
+                    }
+            }
+        })
+    }
+    else{
+            res.status(401).jsonp({error : "Utilizador não tem permissão para ver as estatísticas"})
+    }
+}
+
 module.exports.validateChangeUpload = (req, res, next) => {
 const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
