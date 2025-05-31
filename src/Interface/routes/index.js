@@ -5,7 +5,6 @@ const session = require('express-session');
 const multer = require('multer');
 const upload = multer();
 const FormData = require('form-data');
-const file = require('../../API_de_dados/models/file');
 
 function now() {
   return new Date().toLocaleString('pt-PT', { hour12: false });
@@ -14,26 +13,21 @@ function now() {
 /* GET home page. */
 router.get('/', function(req, res, next) {
   delete req.session.currentDiary;
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   const errorMsg = req.session.searchError;
   delete req.session.searchError;
   res.render('home',{title: "O Meu Eu Digital", date: date, role: req.session.level, username: req.session.user, error: errorMsg});
 });
 
-//router.get('/home', function(req, res, next) {
-//  var date = new Date().toLocaleString('pt-PT', { hour12: false });
-//  res.render('home',{title: "I am ... (in bits and bytes)", date: date,role:"cons"});
-//});
-
 // formulário registar utilizador
 router.get('/administration/users/register', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   res.render('registarUser',{title: "Adicionar Item", date: date, role: req.session.level, username: req.session.user});
 });
 
 // post do formulário de registo
 router.post('/administration/users/register', function(req, res, next) {
-  var date = new Date().toLocaleString('pt-PT', { hour12: false });
+  var date = now();
   req.body.user = req.session.user;
   req.body.token = req.session.token;
   axios.post('http://localhost:3002/users', req.body, {
@@ -105,19 +99,9 @@ router.get('/administration/users', function(req, res, next) {
   });
 });
 
-//router.get('/recursos', function(req, res, next) {
-//  var date = new Date().toLocaleString('pt-PT', { hour12: false });
-//  res.render('recursos',{title: "Recursos", date: date,role:"admin"});
-//});
-
 //router.get('/stats', function(req, res, next) {
 //  var date = new Date().toLocaleString('pt-PT', { hour12: false });
 //  res.render('stats',{title: "Estatísticas", date: date,role:"admin"});
-//});
-
-//router.get('/news', function(req, res, next) {
-//  var date = new Date().toLocaleString('pt-PT', { hour12: false });
-//  res.render('news',{title: "Notícias", date: date,role:"admin"});
 //});
 
 router.get('/file/:id', async (req, res) => {
@@ -177,6 +161,26 @@ router.get('/myDiary', function(req, res, next) {
   }).catch(function (error) {
     res.render('error',{title: "Erro", date: date, message : "Erro ao ler o diário", error: error});
   });
+});
+
+router.get('/uploads/download/:id', async function(req, res, next) {
+  const uploadId = req.params.id;
+  const token = req.session.token;
+  try {
+    const axiosConfig = {
+      responseType: 'stream',
+      headers: {}
+    };
+    if (token) {
+      axiosConfig.headers.Authorization = `Bearer ${token}`;
+    }
+    const axiosResponse = await axios.get(`http://localhost:3001/upload/download/${uploadId}`, axiosConfig);
+    res.setHeader('Content-Type', axiosResponse.headers['content-type']);
+    axiosResponse.data.pipe(res);
+  } catch (err) {
+    console.error('Erro ao obter o upload:', err.message);
+    res.status(500).send('Erro ao obter o upload');
+  }
 });
 
 router.get('/uploads/delete/:id', function(req, res, next) {

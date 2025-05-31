@@ -19,6 +19,7 @@ block content
                             else 
                                 img(src="/images/private.png", style="height:30px;" )
                             span=entry.upload_date
+                            a(href=`/uploads/download/${entry._id}`, download=entry.description) Download
                         form(method="GET", action=`/uploads/edit/${entry._id}`)
                             button.w3-bar-item.w3-right.w3-button.w3-green(type="submit") ✏️
                         form(method="GET", action=`/uploads/delete/${entry._id}`)

@@ -4,8 +4,10 @@ var Upload = require('../controllers/upload')
 var File = require('../controllers/file')
 var multer = require('multer')
 var fs = require('fs')
+const archiver = require('archiver');
 var jszip = require('jszip')
 var xml2js = require('xml2js')
+const { create } = require('xmlbuilder2');
 var path = require('path');
 const Auth = require('../auth/auth')
 
@@ -110,6 +112,121 @@ router.get('/diary/:id', Auth.validateGetUserDiary, async function(req, res, nex
     const diary = await Upload.publicUserUploads(req.params.id);
     logStream.write(`${date}:\n Diário do utilizador ${req.params.id} acedido por utilizador público.\n`);
     return res.status(200).jsonp(diary);
+  }
+});
+
+router.get('/download/:id', Auth.validateGetUpload, async function(req, res, next) {
+  date = new Date().toISOString();
+  if(req.level=="USER"){
+      const upload = await Upload.findById(req.params.id);
+      if (!upload) return res.status(404).json({ error: 'Upload não encontrado'});
+      const zipFilename = `upload_${upload._id}.zip`;
+      res.set({
+        'Content-Type': 'application/zip',
+        'Content-Disposition': `attachment; filename="${zipFilename}"`
+      });
+      const archive = archiver('zip', { zlib: { level: 9 } });
+      archive.pipe(res);
+      const xml = create({ version: '1.0', encoding: 'UTF-8' })
+        .ele('manifesto')
+          .ele('public').txt(String(upload.public)).up()
+          .ele('description').txt(upload.description).up()
+          .ele('uploaded_by').txt(upload.uploaded_by).up()
+          .ele('upload_date').txt(upload.upload_date).up()
+          .ele('files');
+      for (const f_id of upload.files) {
+        const file = await File.findById(f_id);
+        if (fs.existsSync(file.path)) {
+          archive.file(file.path, { name: path.basename(file.path) });
+        }
+        const fileNode = xml.ele('file');
+        fileNode.ele('title').txt(file.title).up();
+        fileNode.ele('type').txt(file.type).up();
+        const tagsNode = fileNode.ele('tags');
+        (file.tags || []).forEach(tag => {
+          tagsNode.ele('tag').txt(tag).up();
+        });
+        fileNode.up()
+      }
+      const xmlStr = xml.end({ prettyPrint: true });
+      const manifestBuffer = Buffer.from(xmlStr, 'utf-8');
+      archive.append(manifestBuffer, { name: 'manifesto-DIP.xml' });
+      logStream.write(`${date}:\n Upload ${req.params.id} descarregado por utilizador público.\n`);
+      await archive.finalize();
+  }
+  else if (req.level=="ADMIN"){
+      const upload = await Upload.findById(req.params.id);
+      if (!upload) return res.status(404).json({ error: 'Upload não encontrado'});
+      const zipFilename = `upload_${upload._id}.zip`;
+      res.set({
+        'Content-Type': 'application/zip',
+        'Content-Disposition': `attachment; filename="${zipFilename}"`
+      });
+      const archive = archiver('zip', { zlib: { level: 9 } });
+      archive.pipe(res);
+      const xml = create({ version: '1.0', encoding: 'UTF-8' })
+        .ele('manifesto')
+          .ele('public').txt(String(upload.public)).up()
+          .ele('description').txt(upload.description).up()
+          .ele('uploaded_by').txt(upload.uploaded_by).up()
+          .ele('upload_date').txt(upload.upload_date).up()
+          .ele('files');
+      for (const f_id of upload.files) {
+        const file = await File.findById(f_id);
+        if (fs.existsSync(file.path)) {
+          archive.file(file.path, { name: path.basename(file.path) });
+        }
+        const fileNode = xml.ele('file');
+        fileNode.ele('title').txt(file.title).up();
+        fileNode.ele('type').txt(file.type).up();
+        const tagsNode = fileNode.ele('tags');
+        (file.tags || []).forEach(tag => {
+          tagsNode.ele('tag').txt(tag).up();
+        });
+        fileNode.up()
+      }
+      const xmlStr = xml.end({ prettyPrint: true });
+      const manifestBuffer = Buffer.from(xmlStr, 'utf-8');
+      archive.append(manifestBuffer, { name: 'manifesto-DIP.xml' });
+      logStream.write(`${date}:\n Upload ${req.params.id} descarregado por utilizador público.\n`);
+      await archive.finalize();
+  }
+  else{
+      const upload = await Upload.findById(req.params.id);
+      if (!upload) return res.status(404).json({ error: 'Upload não encontrado'});
+      const zipFilename = `upload_${upload._id}.zip`;
+      res.set({
+        'Content-Type': 'application/zip',
+        'Content-Disposition': `attachment; filename="${zipFilename}"`
+      });
+      const archive = archiver('zip', { zlib: { level: 9 } });
+      archive.pipe(res);
+      const xml = create({ version: '1.0', encoding: 'UTF-8' })
+        .ele('manifesto')
+          .ele('public').txt(String(upload.public)).up()
+          .ele('description').txt(upload.description).up()
+          .ele('uploaded_by').txt(upload.uploaded_by).up()
+          .ele('upload_date').txt(upload.upload_date).up()
+          .ele('files');
+      for (const f_id of upload.files) {
+        const file = await File.findById(f_id);
+        if (fs.existsSync(file.path)) {
+          archive.file(file.path, { name: path.basename(file.path) });
+        }
+        const fileNode = xml.ele('file');
+        fileNode.ele('title').txt(file.title).up();
+        fileNode.ele('type').txt(file.type).up();
+        const tagsNode = fileNode.ele('tags');
+        (file.tags || []).forEach(tag => {
+          tagsNode.ele('tag').txt(tag).up();
+        });
+        fileNode.up()
+      }
+      const xmlStr = xml.end({ prettyPrint: true });
+      const manifestBuffer = Buffer.from(xmlStr, 'utf-8');
+      archive.append(manifestBuffer, { name: 'manifesto-DIP.xml' });
+      logStream.write(`${date}:\n Upload ${req.params.id} descarregado por utilizador público.\n`);
+      await archive.finalize();
   }
 });
 
