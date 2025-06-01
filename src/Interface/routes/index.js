@@ -106,7 +106,7 @@ router.get('/administration/users', function(req, res, next) {
       Authorization: `Bearer ${req.session.token}`
     }
   }).then(resp => {
-    res.render('users',{title: "Utilizadores", users: resp.data.data, date: date, role:"admin"});
+    res.render('users',{title: "Utilizadores", users: resp.data.data, date: date, role: req.session.level, username: req.session.user});
   }).catch(function (error) {
     res.render('error',{title: "Erro", date: date, message : "Não foi possível aceder à página", error: error});
   });
@@ -158,17 +158,22 @@ router.get('/users', async (req, res) => {
 });
 
 router.get('/myDiary', function(req, res, next) {
-  req.session.currentDiary = req.session.user;
-  var date = now();
-  axios.get(`http://localhost:3001/upload/diary/${req.session.user}`, {
-    headers: {
-      Authorization: `Bearer ${req.session.token}`
-    }
-  }).then(resp => {
-    res.render('myDiary',{title: "O Meu Diário", date: date, diary: resp.data, role: req.session.level, username: req.session.user});
-  }).catch(function (error) {
-    res.render('error',{title: "Erro", date: date, message : "Erro ao ler o diário", error: error});
-  });
+  if(req.session.user){
+    req.session.currentDiary = req.session.user;
+    var date = now();
+    axios.get(`http://localhost:3001/upload/diary/${req.session.user}`, {
+      headers: {
+        Authorization: `Bearer ${req.session.token}`
+      }
+    }).then(resp => {
+      res.render('myDiary',{title: "O Meu Diário", date: date, diary: resp.data, role: req.session.level, username: req.session.user});
+    }).catch(function (error) {
+      res.render('error',{title: "Erro", date: date, message : "Erro ao ler o diário", error: error});
+    });
+  }
+  else{
+    res.redirect("/");
+  }
 });
 
 router.get('/uploads/download/:id', async function(req, res, next) {
