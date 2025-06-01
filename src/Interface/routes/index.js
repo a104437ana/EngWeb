@@ -446,22 +446,27 @@ router.get('/login', function(req, res, next) {
 });
 
 router.post('/login', function(req, res, next) {
-  // ir buscar lista de admins
-  if(req.body.username=="admin"){
-    req.body.level = 1;
-  }
-  else{
-    req.body.level = 0;
-  }
-  axios.post(`http://localhost:3002/users/login`, req.body).then(resp => {
-    req.session.user = req.body.username;
-    req.session.level = req.body.level;
-    req.session.token = resp.data.token;
-    res.redirect('/');
+  axios.get(`http://localhost:3002/users/admins`).then(resp1 => {
+    var admins = resp1.data.data
+    if(admins.includes(req.body.username)){
+      req.body.level = 1;
+    }
+    else{
+      req.body.level = 0;
+    }
+    axios.post(`http://localhost:3002/users/login`, req.body).then(resp => {
+      req.session.user = req.body.username;
+      req.session.level = req.body.level;
+      req.session.token = resp.data.token;
+      res.redirect('/');
+    }).catch(function (error) {
+      req.session.loginError = "Erro no login: " + (error.response?.data?.message || "Tente novamente.");
+      res.redirect('/login');
+    });
   }).catch(function (error) {
-    req.session.loginError = "Erro no login: " + (error.response?.data?.message || "Tente novamente.");
-    res.redirect('/login');
-  });
+      req.session.loginError = "Erro no login: " + (error.response?.data?.message || "Tente novamente.");
+      res.redirect('/login');
+  })
 });
 
 router.get('/signup', function(req, res, next) {

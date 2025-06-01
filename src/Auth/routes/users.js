@@ -13,6 +13,12 @@ router.get('/', Auth.validateAdmin, function(req, res) {
     .catch(err => res.status(500).jsonp({ error: err }))
 });
 
+router.get('/admins', function(req, res) {
+  User.getAdmins()
+    .then(data => res.status(200).jsonp({ data: data.map(admin => admin.username) }))
+    .catch(err => res.status(500).jsonp({ error: err }))
+});
+
 router.get('/exists/:id', function(req, res) {
   User.existsUser(req.params.id)
     .then(exists => res.status(200).jsonp({ data: exists }))

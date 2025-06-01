@@ -14,6 +14,12 @@ module.exports.getUser = (id) => {
         .exec()
 }
 
+module.exports.getAdmins = () => {
+    return User
+        .find({level: 1})
+        .exec()
+}
+
 module.exports.existsUser = async (id) => {
     const e = await User
         .exists({username: id})
