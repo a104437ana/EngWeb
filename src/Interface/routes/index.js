@@ -3,7 +3,8 @@ var router = express.Router();
 var axios = require('axios');
 const session = require('express-session');
 const multer = require('multer');
-const upload = multer();
+const upload = multer({ dest: 'uploads/' });
+const fs = require('fs')
 const FormData = require('form-data');
 
 function now() {
@@ -419,20 +420,39 @@ router.get('/registar', function(req, res, next) {
   res.render('registar',{title: "Adicionar Item", date: date, role: req.session.level, username: req.session.user});
 });
 
-router.post('/registar', function(req, res, next) {
-  var date = now();
-  req.body.user = req.session.user;
-  req.body.token = req.session.token;
-  axios.post('http://localhost:3001/upload/', req.body, {
-    headers: {
-      Authorization: `Bearer ${req.session.token}`
-    }
-  }).then(resp => {
+
+router.post('/registar', upload.single('ficheiro'), async function(req, res, next) {
+  const date = now();
+  if (!req.file || !req.file.path) {
+    return res.render('error', {
+      title: "Erro",
+      date: date,
+      message: "Ficheiro não foi recebido corretamente.",
+      error: {}
+    });
+  }
+  const formData = new FormData();
+  formData.append('user', req.session.user);
+  formData.append('token', req.session.token);
+  formData.append('ficheiro', fs.createReadStream(req.file.path), req.file.originalname);
+  try {
+    await axios.post('http://localhost:3001/upload/', formData, {
+      headers: {
+        ...formData.getHeaders(),
+        Authorization: `Bearer ${req.session.token}`
+      }
+    });
     res.redirect('/myDiary');
-  }).catch(function (error) {
-    res.render('error',{title: "Erro", date: date, message : "Erro ao fazer upload", error: error});
-  });
+  } catch (error) {
+    res.render('error', {
+      title: "Erro",
+      date: date,
+      message: "Erro ao fazer upload",
+      error: error
+    });
+  }
 });
+
 
 router.get('/logout', function(req, res, next) {
   delete req.session.user;

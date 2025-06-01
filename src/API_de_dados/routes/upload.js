@@ -54,7 +54,7 @@ async function saveMetadata(zip, manifest, path, user, public){
     const filename = element.filename;
     let tags = element.tags?.tag || [];
     const file = {
-      path: path + filename,
+      path: path + '/' + filename,
       title: element.title,
       type: element.type,
       tags: tags,
@@ -325,9 +325,15 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
   }
 });
 
-function calcFolderPath(id){
-  const path = __dirname + '/../public/fileStore/'+ id;
-  return path;
+function calcFolderPath(id) {
+  const id_str = (id.toString());
+  const level1 = id_str.slice(0, 2);
+  const level2 = id_str.slice(2, 4);
+  const level3 = id_str.slice(4, 6);
+  const rest = id_str.slice(6);
+
+  const folderPath = path.join(__dirname, '..', 'public', 'fileStore', level1, level2, level3, rest);
+  return folderPath;
 }
 
 router.post('/', upload.single('ficheiro'), Auth.validate, async function(req, res, next) {
@@ -354,6 +360,7 @@ router.post('/', upload.single('ficheiro'), Auth.validate, async function(req, r
     return res.status(201).jsonp(data)
   }
   catch (error) {
+    console.log(error);
     res.status(500).json({ error: error });
   }
 });

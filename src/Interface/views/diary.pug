@@ -5,7 +5,7 @@ block content
         .w3-margin-top(style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;")
             img(src="/images/diary.png", style="height:50px;" )
             h1(style="margin: 0;")=`Diário de ${user}` 
-            input#w3-search.w3-input.w3-border(type="text", placeholder="🔎 Buscar por descrição...", style="max-width: 300px;")
+            input#w3-search.w3-input.w3-border(type="text", placeholder="🔎 Pesquisar por descrição...", style="max-width: 300px;")
     ul.w3-ul
         each entry in diary
             li.w3-content.w3-card-4.w3-white.w3-round.w3-margin-bottom(style="position: relative;")
