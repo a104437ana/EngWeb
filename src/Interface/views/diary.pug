@@ -22,7 +22,7 @@ block content
                                 img(src="/images/public.png", style="height:30px;" )
                             else 
                                 img(src="/images/private.png", style="height:30px;" )
-                            span  #{entry.upload_date}
+                            span  #{entry.formatted_date}
                         a.w3-button.w3-hover-light-blue(href=`/uploads/download/${entry._id}`, download=entry.description, style="background-color: #ddd;") Download
                 a(href=`/uploads/${entry._id}`, style="text-decoration: none; color: inherit; display: block; cursor: pointer")
                     main.w3-container.w3-margin-bottom(style="display: flex; justify-content: center; align-items: center;")
