@@ -36,7 +36,7 @@ router.post('/', function(req, res) {
   userModel.register(new userModel({
       username: req.body.username,
       name: req.body.name,
-      level: req.body.level,
+      level: req.body.level || 0,
       active: true,
       dateCreated: date
     }),
