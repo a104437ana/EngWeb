@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var axios = require('axios');
+var path = require('path');
 const session = require('express-session');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
@@ -345,7 +346,9 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
     for (const file of filesData) {
       if (file.file) {
         const formData = new FormData();
-        formData.append('file', file.file.buffer, file.file.originalname);
+        const filePath = path.resolve(file.file.path);
+        const fileBuffer = fs.readFileSync(filePath);
+        formData.append('file', fileBuffer, file.file.originalname);
         await axios.put(`http://localhost:3001/file/${file.id}`, formData, {
           headers: {
             ...formData.getHeaders(),
@@ -373,7 +376,9 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
     for (const file of newFiles) {
       if (file.file) {
         const formData = new FormData();
-        formData.append('file', file.file.buffer, file.file.originalname);
+        const filePath = path.resolve(file.file.path);
+        const fileBuffer = fs.readFileSync(filePath);
+        formData.append('file', fileBuffer, file.file.originalname);
         formData.append('title', String(file.title || ''));
         formData.append('tags', JSON.stringify(file.tags || []));
         formData.append('public', String(req.body.public === 'true' || req.body.public === true));
