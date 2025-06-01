@@ -18,7 +18,7 @@ O código desenvolvido pode ser encontrado na pasta [src](src).
 
 Imagens usadas neste relatório podem ser encontradas na pasta [images](images).
 
-Um exemplo SIP para testar o upload de uma publicação: [SIP.zip](SIP.zip).
+Um exemplo de SIP para testar o upload de uma publicação: [SIP.zip](SIP.zip).
 
 ## Autores
 ### Equipa Bugbusters 🪲🚫 - Grupo 12
