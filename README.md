@@ -35,9 +35,14 @@ O Meu Eu Digital é uma aplicação que permite aos seus utilizadores guardarem 
 ## Arquitetura
 
 Para implementar esta aplicação, implementamos 3 serviços:
-- API de dados (pasta [src/API_de_dados](src/API_de_dados) e porta 3002)
-- Autenticação (pasta [src/Auth](src/Auth) e porta 3001)
-- Interface (pasta [src/Interface](src/Interface) e porta 3000)
+- **Autenticação** (pasta [src/Auth](src/Auth) e porta 3002) - responsável por gerenciar a autenticação e autorização dos utilizadores.
+- **API de dados** (pasta [src/API_de_dados](src/API_de_dados) e porta 3001) - responsável por fornecer os dados da aplicação.
+- **Interface** (pasta [src/Interface](src/Interface) e porta 3000) - responsável pelo front-end da aplicação.
+
+A nossa aplicação utiliza:
+- Uma base de dados **MongoDB** chamada `users` para armazenar credenciais dos utilizadores.
+- Uma base de dados **MongoDB** chamada `project_backend` para armazenar metainformação dos ficheiros.
+- Uma pasta no sistema de ficheiros chamada `fileStore` para armazenar os ficheiros.
 
 ## Páginas Públicas
 Estas páginas são as páginas que todos podem ver, mesmo que não tenham conta na aplicação. Todas estas páginas têm uma barra de navegação, com opções de página inicial, login, registar-se e ainda uma barra de pesquisa. Usando a barra de pesquisa, podemos procurar utilizadores para ver os seus diários.
