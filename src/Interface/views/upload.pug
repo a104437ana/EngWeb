@@ -25,6 +25,8 @@ block content
                             img(src=`/file/${file.id}`, alt=file.title, style="width:900px;height:auto;")
                         else if file.type === 'pdf'
                             iframe(src=`/file/${file.id}`, width='900px', height='900px')
+                        else if file.type === 'text'
+                            iframe(src=`/file/${file.id}`, width='900px', height='900px')
                         div.w3-container.w3-section
                             each tag in file.tags 
                                 span.w3-tag.w3-round.w3-margin-right(style="display: inline-flex; align-items: center; gap: 6px;")=tag

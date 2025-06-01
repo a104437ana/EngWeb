@@ -32,5 +32,13 @@
                 <tag>Mobile</tag>
             </tags>
         </file>
+        <file>
+            <filename>texto.txt</filename>
+            <title>Ficheiro de texto</title>
+            <type>text</type>
+            <tags>
+                <tag>Texto</tag>
+            </tags>
+        </file>
     </files>
 </manifesto>
