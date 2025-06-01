@@ -32,6 +32,13 @@ Um exemplo de SIP para testar o upload de uma publicação: [SIP.zip](SIP.zip).
 
 O Meu Eu Digital é uma aplicação que permite aos seus utilizadores guardarem e expressarem os seus pensamentos e momentos, um diário digital em que cada utilizador possui um espaço pessoal onde pode registar imagens, pdfs e texto.
 
+## Arquitetura
+
+Para implementar esta aplicação, implementamos 3 serviços:
+- API de dados (pasta [src/API_de_dados](src/API_de_dados) e porta 3002)
+- Autenticação (pasta [src/Auth](src/Auth) e porta 3001)
+- Interface (pasta [src/Interface](src/Interface) e porta 3000)
+
 ## Páginas Públicas
 Estas páginas são as páginas que todos podem ver, mesmo que não tenham conta na aplicação. Todas estas páginas têm uma barra de navegação, com opções de página inicial, login, registar-se e ainda uma barra de pesquisa. Usando a barra de pesquisa, podemos procurar utilizadores para ver os seus diários.
 ![Barra de Navegação](images/barra1.png)
