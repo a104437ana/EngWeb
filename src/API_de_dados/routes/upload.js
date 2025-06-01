@@ -420,8 +420,8 @@ router.put('/:id', Auth.validateChangeUpload, async function(req, res, next) {
             });
           }
           else{
-            path = await File.delete(file.id);
-            await removeFile(path);
+            var f_path = await File.delete(file.id);
+            await removeFile(f_path);
           }
         }
       }
