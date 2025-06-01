@@ -178,7 +178,6 @@ router.get('/users', async (req, res) => {
         Authorization: `Bearer ${req.session.token}`
       }
     }).then(resp => {
-      console.log(resp.data)
       res.render('diary',{title: `Diário de ${user}`, date: date, diary: resp.data, role: req.session.level, username: req.session.user, user:user});
     }).catch(function (error) {
       res.render('error',{title: "Erro", date: date, message : "Erro ao ler o diário", error: error});
@@ -475,11 +474,11 @@ router.post('/login', function(req, res, next) {
       req.session.token = resp.data.token;
       res.redirect('/');
     }).catch(function (error) {
-      req.session.loginError = "Erro no login: " + (error.response?.data?.message || "Tente novamente.");
+      req.session.loginError = "Erro no login: " + (error.response?.data?.message || error.response?.data?.error || "Tente novamente.");
       res.redirect('/login');
     });
   }).catch(function (error) {
-      req.session.loginError = "Erro no login: " + (error.response?.data?.message || "Tente novamente.");
+      req.session.loginError = "Erro no login: " + (error.response?.data?.message || error.response?.data?.error || "Tente novamente.");
       res.redirect('/login');
   })
 });

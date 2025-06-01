@@ -62,6 +62,7 @@ router.post('/', function(req, res) {
 });
 
 router.post('/login', passport.authenticate('local'), function(req, res) {
+  if (!req.body.active) return res.status(403).jsonp({ error: 'Conta inativa. Contacte o administrador.' });
   jwt.sign({
     username: req.user.username,
     level: req.user.level,
