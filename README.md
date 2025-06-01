@@ -18,9 +18,7 @@ O código desenvolvido pode ser encontrado na pasta [src](src).
 
 Imagens usadas neste relatório podem ser encontradas na pasta [images](images).
 
-Exemplos de ficheiros usados nesta aplicação podem ser encontrados na pasta [SIP](SIP).
-
-Um exemplo de zip usado nesta aplicação: [SIP.zip](SIP.zip).
+Um exemplo SIP para testar o upload de uma publicação: [SIP.zip](SIP.zip).
 
 ## Autores
 ### Equipa Bugbusters 🪲🚫 - Grupo 12
