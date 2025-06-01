@@ -4,7 +4,7 @@ block content
   .w3-row
     .w3-col.m6
         h1.w3-margin-left Logs de Utilização
-        pre(style="max-height: 500px; overflow-y: auto; background-color:rgb(23, 23, 23); padding: 10px; color: white")
+        pre.w3-margin-left(style="max-height: 500px; overflow-y: auto; background-color:rgb(23, 23, 23); padding: 10px; color: white")
           each line in stats.logs.split('\n')
             | #{line}
             br
