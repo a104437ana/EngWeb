@@ -68,15 +68,14 @@ async function saveMetadata(zip, manifest, path, user, public){
 }
 
 async function saveZipFiles(zip, manifest, zipFolderPath, outputFolderPath) {
-  const fullOutputPath = outputFolderPath + manifest.folder_name + '/';
   const fullZipPath = zipFolderPath;
-  await fs.promises.mkdir(fullOutputPath, { recursive: true });
+  await fs.promises.mkdir(outputFolderPath, { recursive: true });
   let files = manifest.files?.file || [];
   if (!Array.isArray(files)) files = [files];
   for (const element of files) {
     const filename = element.filename;
     const zipFilePath = fullZipPath + '/' + filename;
-    const outputPath = fullOutputPath + filename;  
+    const outputPath = outputFolderPath + '/' + filename;  
     try {
       const content = await zip.file(zipFilePath).async('nodebuffer');
       await fs.promises.writeFile(outputPath, content);
@@ -326,27 +325,31 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
   }
 });
 
-
+function calcFolderPath(id){
+  const path = __dirname + '/../public/fileStore/'+ id;
+  return path;
+}
 
 router.post('/', upload.single('ficheiro'), Auth.validate, async function(req, res, next) {
   try {
     const { zip, manifestData } = await readManifest(req.file.path);
     await checkManifestFolder(zip, manifestData, "SIP");
-    const file_ids = await saveMetadata(zip, manifestData, __dirname + '/../public/fileStore/' + manifestData.folder_name + '/', req.body.user, manifestData.public);
     var upload = {
-      path : __dirname + '/../public/fileStore/' + manifestData.folder_name + '/',
+      path : "",
       upload_date : new Date().toISOString(),
       uploaded_by : req.body.user,
       public : manifestData.public,
       description : manifestData.description,
-      files : file_ids, 
+      files : [], 
       views : 0,
       downloads: 0
     }
     const data  = await Upload.save(upload);
+    const folder_path = calcFolderPath(data._id);
+    const file_ids = await saveMetadata(zip, manifestData, folder_path, req.body.user, manifestData.public);
+    await Upload.updateFilesAndPath(data._id, folder_path, file_ids)
     const baseZipPath = 'SIP'; 
-    const baseOutputPath = __dirname + '/../public/fileStore/';
-    await saveZipFiles(zip, manifestData, baseZipPath, baseOutputPath);
+    await saveZipFiles(zip, manifestData, baseZipPath, folder_path);
     logStream.write(`${data.upload_date.toISOString()}:\n Upload ${data._id} realizado pelo utilizador ${data.uploaded_by}, ficheiros guardados em ${data.path}\n`)
     return res.status(201).jsonp(data)
   }

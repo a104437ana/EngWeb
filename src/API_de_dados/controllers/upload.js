@@ -68,6 +68,10 @@ module.exports.addFile = async (id, f_id) => {
     return await Upload.findByIdAndUpdate(id, { $push: { files: f_id } }, { new: true }).exec();
 }
 
+module.exports.updateFilesAndPath = async (id, path, f_ids) => {
+    return await Upload.findByIdAndUpdate(id, { files: f_ids, path : path }, { new: true }).exec();
+}
+
 module.exports.addView = async (id) => {
     return await Upload.findByIdAndUpdate(id, { $inc: { views: 1 } }, { new: true }).exec();
 }
