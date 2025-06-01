@@ -207,3 +207,6 @@ npm start
 
 ### Upload de uma entrada no diário:
 O upload de uma nova entrada no diário tem de ser feito num formato (SIP) que definimos, exemplificado no ficheiro [SIP.zip](SIP.zip).
+
+# Conclusão
+No geral, consideramos que conseguimos fazer o que era o foco do trabalho: a gestão de uploads dos utilizadores e a sua disponibilização para visualização, download e edição, bem como a parte opcional de ter vários utilizadores autenticados, cada um com o seu próprio diário. Com mais tempo gostariamos de implementar outras funcionalidades mencionadas no enunciado, como a ligação a redes sociais e outras formas de autenticação, bem como a implementação de um feed de publicações que mostrasse publicações de vários utilizadores.
