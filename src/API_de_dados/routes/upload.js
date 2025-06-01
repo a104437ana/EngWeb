@@ -390,7 +390,7 @@ router.put('/addFile/:id', Auth.validateChangeUpload, multer().single('file'),as
     var file = req.file;
     const f_id = await File.insert({
           title: req.body.title,
-          tags : req.body.tags,
+          tags : JSON.parse(req.body.tags),
           uploaded_by : upload.uploaded_by,
           public : upload.public
     })
