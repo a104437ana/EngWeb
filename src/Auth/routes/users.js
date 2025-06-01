@@ -85,7 +85,6 @@ router.put('/account/:id', Auth.validateUser, async function(req, res) {
     }
     return res.status(201).send({ message: 'Atualização bem sucedida.' });
   } catch (err) {
-    console.error('Erro ao atualizar conta:', err);
     return res.status(500).send({ error: 'Erro ao atualizar conta.' });
   }
 });

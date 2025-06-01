@@ -34,6 +34,7 @@ git clone git@github.com:a104437ana/EngWeb.git
 ```
 git clone https://github.com/a104437ana/EngWeb.git
 ```
+### Ter um docker em execução com o mongoDB na porta default (localhost:27017)
 ### Entrar no repositório:
 ```
 cd EngWeb/src
@@ -73,3 +74,6 @@ npm i
 npm start
 ```
 ### Explorar: http://localhost:3000
+
+### Upload de uma entrada no diário:
+O upload de uma nova entrada no diário tem de ser feito num formato (SIP) que definimos, exemplificado no ficheiro [SIP.zip](SIP.zip).

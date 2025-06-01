@@ -328,9 +328,9 @@ router.get('/:id', Auth.validateGetUpload, async function(req, res, next) {
 
 
 
-router.post('/', upload.single('file'), Auth.validate, async function(req, res, next) {
+router.post('/', upload.single('ficheiro'), Auth.validate, async function(req, res, next) {
   try {
-    const { zip, manifestData } = await readManifest(req.body.file);
+    const { zip, manifestData } = await readManifest(req.file.path);
     await checkManifestFolder(zip, manifestData, "SIP");
     const file_ids = await saveMetadata(zip, manifestData, __dirname + '/../public/fileStore/' + manifestData.folder_name + '/', req.body.user, manifestData.public);
     var upload = {
