@@ -23,6 +23,11 @@ O código desenvolvido pode ser encontrado na pasta [src](src).
 
 ![BUGBUSTERS](Bugbusters.png)
 
+# O Meu Eu Digital
+
+O meu eu digital é uma aplicação que permite os seus utilizadores guardarem e expressarem os seus pensamentos e momentos,
+um diário digital em que cada utilizador possui um espaço pessoal onde pode registar imagens, pdfs e texto.
+
 # Utilização
 
 ### Clonar o repositório:

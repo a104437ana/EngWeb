@@ -17,6 +17,9 @@ block content
         label(style="display: flex; align-items: center; gap: 8px;")
           h2.w3-left Público
           input.w3-check(type="checkbox", name="public", checked=upload.public, value="true")
+    .w3-section.w3-margin(style="position: relative;")
+      button#add-new-file-btn.w3-button.w3-green.w3-margin-top.w3-right(type="button", style="position: absolute; top: -5rem; right: 0px;") + Novo ficheiro
+      #new-files-container
     ul.w3-ul
       each file, i in upload.files
         li.w3-content.w3-card-4.w3-white.w3-round.w3-margin-bottom(style="position: relative;")
@@ -51,12 +54,6 @@ block content
           .w3-container.w3-margin-bottom
             label Alterar ficheiro
             input.w3-input.w3-border.w3-round(type="file", name=`files[${i}][file]`)
-    .w3-section.w3-margin
-      h3 Adicionar novos ficheiros
-      #new-files-container
-      button#add-new-file-btn.w3-button.w3-green.w3-margin-top(type="button") + Novo ficheiro
-    .w3-section.w3-margin.w3-right
-      button.w3-button.w3-medium.w3-cyan.w3-text-black.w3-hover-cyan.w3-hover-text-black(type="submit", style="min-width: 400px;") Editar
   template#new-file-template
     li.w3-content.w3-card-4.w3-white.w3-round.w3-margin-bottom.w3-padding(style="list-style: none;" data-index="__INDEX__")
       input(type="hidden", name="newFiles[__INDEX__][new]", value="true")
@@ -160,7 +157,7 @@ block content
         html.querySelectorAll('[data-name]').forEach(el => {
           el.setAttribute('data-name', el.getAttribute('data-name').replace(/__INDEX__/g, newFileIndex));
         });
-        newFilesContainer.appendChild(clone);
+        newFilesContainer.insertBefore(clone, newFilesContainer.firstChild);
         setupTagManagement(newFilesContainer.lastElementChild);
         newFileIndex++;
       });
