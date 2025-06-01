@@ -139,6 +139,7 @@ router.get('/administration/users', function(req, res, next) {
       Authorization: `Bearer ${req.session.token}`
     }
   }).then(resp => {
+    resp.data.data.forEach(e => e.formatted_dateCreated = new Date(e.dateCreated).toLocaleString('pt-PT', { hour12: false }));
     res.render('users',{title: "Utilizadores", users: resp.data.data, date: date, role: req.session.level, username: req.session.user});
   }).catch(function (error) {
     res.render('error',{title: "Erro", date: date, message : "Não foi possível aceder à página", error: error});
@@ -200,6 +201,7 @@ router.get('/myDiary', function(req, res, next) {
         Authorization: `Bearer ${req.session.token}`
       }
     }).then(resp => {
+      resp.data.forEach(e => e.formatted_date = new Date(e.upload_date).toLocaleString('pt-PT', { hour12: false }));
       res.render('myDiary',{title: "O Meu Diário", date: date, diary: resp.data, role: req.session.level, username: req.session.user});
     }).catch(function (error) {
       res.render('error',{title: "Erro", date: date, message : "Erro ao ler o diário", error: error});
@@ -256,6 +258,7 @@ router.get('/uploads/edit/:id', function(req, res, next) {
       Authorization: `Bearer ${req.session.token}`
     }
   }).then(resp => {
+    resp.data.formatted_date = new Date(resp.data.upload_date).toLocaleString('pt-PT', { hour12: false });
     res.render('editar',{title: "Editar Item", upload: resp.data, date: date, role: req.session.level, username: req.session.user});
   }).catch(function (error) {
     res.render('error',{title: "Erro", date: date, message : "Erro ao ler o upload", error: error});
@@ -404,6 +407,7 @@ router.get('/uploads/:id', function(req, res, next) {
       Authorization: `Bearer ${req.session.token}`
     }
   }).then(resp => {
+    resp.data.formatted_date = new Date(resp.data.upload_date).toLocaleString('pt-PT', { hour12: false });
     res.render('upload',{title: resp.data.description, date: date, upload: resp.data, role: req.session.level, username: req.session.user, token: req.session.token});
   }).catch(function (error) {
     res.render('error',{title: "Erro", date: date, message : "Erro ao ler o upload", error: error});

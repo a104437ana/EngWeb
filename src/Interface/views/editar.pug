@@ -3,8 +3,8 @@ extends layout
 block content
   .w3-container.w3-padding-16
     img(src="/images/diary.png", style="height:50px;")
-    span Editar upload:
-      span= upload.upload_date
+    span  Editar upload:
+      span  #{upload.formatted_date}
   form.w3-container.w3-card.w3-white.w3-round(method="POST" enctype="multipart/form-data")
     .w3-section
       .w3-container(style="display: flex; align-items: center; gap: 16px;")

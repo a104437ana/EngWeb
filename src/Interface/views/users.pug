@@ -22,9 +22,9 @@ block content
                 tr
                     td
                         a(href="/users?user=" + user.username)=user.username
-                    td=user.level
-                    td=user.active
-                    td=user.dateCreated
+                    td=user.level == 0 ? "User" : "Admin"
+                    td=user.active ? "Sim" : "Não"
+                    td=user.formatted_dateCreated
                     td
                         a(href="/administration/users/edit/" + user.username) Editar
                     td

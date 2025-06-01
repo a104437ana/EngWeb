@@ -8,7 +8,7 @@ block content
                 img(src="/images/public.png", style="height:30px;" )
             else 
                 img(src="/images/private.png", style="height:30px;" )
-            span=upload.upload_date
+            span  #{upload.formatted_date}
 
             .w3-margin-top(style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;")
                 h1(style="margin: 0;")=upload.description
