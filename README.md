@@ -1,4 +1,4 @@
-# Projeto EW - I am ... (in bits and bytes) - O meu eu digital
+# Projeto EW - I am ... (in bits and bytes) - O meu eu digital - Relatório
 ## Descrição
 Este repositório foi criado para a Unidade Curricular de **Engenharia Web** (**EW**) e contém o projeto que desenvolvemos ao longo do segundo semestre do ano letivo de 2024/2025, no âmbito desta disciplina.
 
@@ -15,13 +15,20 @@ participação em eventos, organização de eventos, opiniões, comentários sob
 Para mais detalhes sobre os requisitos e objetivos do projeto, consulte o [enunciado](Enunciado.pdf).
 
 O código desenvolvido pode ser encontrado na pasta [src](src).
+
+Imagens usadas neste relatório podem ser encontradas na pasta [images](images).
+
+Exemplos de ficheiros usados nesta aplicação podem ser encontrados na pasta [SIP](SIP).
+
+Um exemplo de zip usado nesta aplicação: [SIP.zip](SIP.zip).
+
 ## Autores
-### Equipa Bugbusters 🪲🚫
+### Equipa Bugbusters 🪲🚫 - Grupo 12
 - A104437 - Ana Sá Oliveira
 - A104263 - Inês Silva Marques
 - A76350 - José Rafael de Oliveira Vilas Boas
 
-![BUGBUSTERS](Bugbusters.png)
+![BUGBUSTERS](images/Bugbusters.png)
 
 # O Meu Eu Digital
 
