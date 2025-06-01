@@ -22,3 +22,54 @@ O código desenvolvido pode ser encontrado na pasta [src](src).
 - A76350 - José Rafael de Oliveira Vilas Boas
 
 ![BUGBUSTERS](Bugbusters.png)
+
+# Utilização
+
+### Clonar o repositório:
+- Via SSH:
+```
+git clone git@github.com:a104437ana/EngWeb.git
+```
+- Ou, se preferir, via HTTPS:
+```
+git clone https://github.com/a104437ana/EngWeb.git
+```
+### Entrar no repositório:
+```
+cd EngWeb/src
+```
+### Abrir 3 terminais
+## Terminal 1
+(correr auth)
+```
+cd Auth
+```
+```
+npm i
+```
+```
+npm start
+```
+## Terminal 2 
+(correr API de dados)
+```
+cd API_de_dados
+```
+```
+npm i
+```
+```
+npm start
+```
+## Terminal 3 
+(correr interface)
+```
+cd Interface
+```
+```
+npm i
+```
+```
+npm start
+```
+### Explorar: http://localhost:3000
