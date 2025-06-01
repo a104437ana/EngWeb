@@ -48,7 +48,7 @@ router.post('/', function(req, res) {
           jwt.sign({
             username: user.username,
             level: user.level,
-            sub: "Projeto EngWeb2025" // para tirar
+            sub: "Projeto EngWeb2025"
           },
           "EngWeb2025",
           {expiresIn: 3600},
@@ -66,7 +66,7 @@ router.post('/login', passport.authenticate('local'), function(req, res) {
   jwt.sign({
     username: req.user.username,
     level: req.user.level,
-    sub: "Projeto EngWeb2025" // para tirar
+    sub: "Projeto EngWeb2025"
   },
   "EngWeb2025",
   {expiresIn: 3600},

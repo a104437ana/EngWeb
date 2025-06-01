@@ -3,24 +3,22 @@ extends layout
 block content
   .w3-row
     .w3-col.m6
-      .w3-card
-        h1 Logs de Utilização
-        pre(style="max-height: 500px; overflow-y: auto; background-color: #f1f1f1; padding: 10px;")
+        h1.w3-margin-left Logs de Utilização
+        pre(style="max-height: 500px; overflow-y: auto; background-color:rgb(23, 23, 23); padding: 10px; color: white")
           each line in stats.logs.split('\n')
             | #{line}
             br
     .w3-col.m6
-      .w3-card
-        h1 Estatísticas 
-        h3 Publicações mais vistas:
+        h1.w3-margin-left Estatísticas 
+        h3.w3-margin-left Publicações mais vistas:
         each upload in stats.estatisticas.most_viewed
-            p
+            p.w3-margin-left
                 | ID: 
                 a(href=`/uploads/${upload._id}`)= upload._id
                 |  – Visualizações: #{upload.views}
-        h3 Publicações mais descarregadas:
+        h3.w3-margin-left Publicações mais descarregadas:
         each upload in stats.estatisticas.most_downloaded
-            p
+            p.w3-margin-left
                 | ID: 
                 a(href=`/uploads/${upload._id}`)= upload._id
                 |  – Downloads: #{upload.downloads}
