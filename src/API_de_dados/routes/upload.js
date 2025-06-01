@@ -356,6 +356,8 @@ router.post('/', upload.single('ficheiro'), Auth.validate, async function(req, r
     await Upload.updateFilesAndPath(data._id, folder_path, file_ids)
     const baseZipPath = 'SIP'; 
     await saveZipFiles(zip, manifestData, baseZipPath, folder_path);
+    fs.unlink(req.file.path, (err) => {
+    });
     logStream.write(`${data.upload_date.toISOString()}:\n Upload ${data._id} realizado pelo utilizador ${data.uploaded_by}, ficheiros guardados em ${data.path}\n`)
     return res.status(201).jsonp(data)
   }

@@ -173,6 +173,9 @@ router.get('/users', async (req, res) => {
   if (!user) {
     return res.redirect('/');
   }
+  else if (user == req.session.user){
+    return res.redirect('/myDiary');
+  }
   var date = now();
   const exists = await axios.get(`http://localhost:3002/users/exists/${user}`);
   if(exists.data.data==true){
@@ -355,6 +358,8 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
             Authorization: `Bearer ${req.session.token}`
           }
         });
+        fs.unlink(filePath, (err) => {
+        });
       }
         }
     let newFiles = [];
@@ -388,9 +393,10 @@ router.post('/uploads/edit/:id', upload.any(), async function(req, res, next) {
             Authorization: `Bearer ${req.session.token}`
           }
         });
+        fs.unlink(filePath, (err) => {
+        });
       }
     }
-
     if (req.session.level == 1) {
       res.redirect(`/users?user=${req.session.currentDiary}`);
     } else {
@@ -447,6 +453,13 @@ router.post('/registar', upload.single('ficheiro'), async function(req, res, nex
         Authorization: `Bearer ${req.session.token}`
       }
     });
+    fs.unlink(req.file.path, (err) => {
+      if (err) {
+        console.error('Erro ao apagar ficheiro temporário:', err);
+      } else {
+        console.log('Ficheiro temporário apagado com sucesso:', req.file.path);
+      }
+    });
     res.redirect('/myDiary');
   } catch (error) {
     res.render('error', {
@@ -468,6 +481,9 @@ router.get('/logout', function(req, res, next) {
 });
 
 router.get('/login', function(req, res, next) {
+  if(req.session.user){
+    return res.redirect("/");
+  }
   var date = now();
   const errorMsg = req.session.loginError;
   delete req.session.loginError;
@@ -499,6 +515,9 @@ router.post('/login', function(req, res, next) {
 });
 
 router.get('/signup', function(req, res, next) {
+  if(req.session.user){
+    return res.redirect("/");
+  }
   var date = now();
   const errorMsg = req.session.signupError;
   delete req.session.signupError;
