@@ -45,7 +45,7 @@ module.exports.updateUser = async (id, data) => {
 
 module.exports.updateUserStatus = (id, status) => {
     return User
-        .findByIdAndUpdate(id, {active: status}, {new: true})
+        .findOneAndUpdate({username: id}, {active: status}, {new: true})
         .exec()
 }
 

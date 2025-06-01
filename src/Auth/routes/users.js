@@ -19,7 +19,7 @@ router.get('/exists/:id', function(req, res) {
     .catch(err => res.status(500).jsonp({ error: err }))
 });
 
-router.get('/:id', Auth.validateAdmin, function(req, res) {
+router.get('/:id', Auth.validateAdminOrUser, function(req, res) {
   User.getUser(req.params.id)
     .then(data => res.status(200).jsonp({ data: data }))
     .catch(err => res.status(500).jsonp({ error: err }))
@@ -67,6 +67,21 @@ router.post('/login', passport.authenticate('local'), function(req, res) {
     if (e) res.status(500).jsonp({ error: `Erro na geração do token: ${e}` })
     else res.status(201).jsonp({ token: token })
   })
+});
+
+router.put('/account/:id', Auth.validateUser, async function(req, res) {
+  try {
+    if (req.body.password) {
+      await User.updateUserPassword(req.params.id, req.body.password);
+    }
+    if (req.body.active!=null) {
+      await User.updateUserStatus(req.params.id, req.body.active);
+    }
+    return res.status(201).send({ message: 'Atualização bem sucedida.' });
+  } catch (err) {
+    console.error('Erro ao atualizar conta:', err);
+    return res.status(500).send({ error: 'Erro ao atualizar conta.' });
+  }
 });
 
 router.put('/:id', Auth.validateAdmin, function(req, res) {

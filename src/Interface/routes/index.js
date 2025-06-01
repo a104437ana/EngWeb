@@ -19,6 +19,39 @@ router.get('/', function(req, res, next) {
   res.render('home',{title: "O Meu Eu Digital", date: date, role: req.session.level, username: req.session.user, error: errorMsg});
 });
 
+router.get('/myAccount', function(req, res, next) {
+  if(req.session.user){
+    var date = now();
+    axios.get(`http://localhost:3002/users/${req.session.user}`, {
+      headers: {
+        Authorization: `Bearer ${req.session.token}`
+      }
+    }).then(resp => {
+      res.render('editarConta',{title: "Editar Conta", date: date, user: resp.data.data, role: req.session.level, username: req.session.user, token: req.session.token});
+    }).catch(function (error) {
+      res.render('error',{title: "Erro", date: date, message : "Erro ao ler utilizador", error: error});
+    });
+  }
+  else{
+    res.redirect("/");
+  }
+});
+
+router.post('/myAccount', function(req, res, next) {
+  var date = now();
+  req.body.user = req.session.user;
+  req.body.token = req.session.token;
+  axios.put(`http://localhost:3002/users/account/${req.session.user}`, req.body, {
+    headers: {
+      Authorization: `Bearer ${req.session.token}`
+    }
+  }).then(resp => {
+    res.redirect('/');
+  }).catch(function (error) {
+    res.render('error',{title: "Erro", date: date, message : "Erro ao editar utilizador", error: error});
+  });
+});
+
 router.get('/administration/stats', function(req, res, next) {
   var date = now();
   axios.get(`http://localhost:3001/upload/stats`, {

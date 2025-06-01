@@ -13,7 +13,6 @@ block content
         table.w3-table-all
             tr.w3-light-blue.w3-text-black
                 th Username
-                th Name
                 th Nível
                 th Ativo
                 th Data Criação
@@ -23,7 +22,6 @@ block content
                 tr
                     td
                         a(href="/users?user=" + user.username)=user.username
-                    td=user.name
                     td=user.level
                     td=user.active
                     td=user.dateCreated
