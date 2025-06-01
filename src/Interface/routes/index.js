@@ -179,6 +179,7 @@ router.get('/users', async (req, res) => {
         Authorization: `Bearer ${req.session.token}`
       }
     }).then(resp => {
+      console.log(resp.data)
       res.render('diary',{title: `Diário de ${user}`, date: date, diary: resp.data, role: req.session.level, username: req.session.user, user:user});
     }).catch(function (error) {
       res.render('error',{title: "Erro", date: date, message : "Erro ao ler o diário", error: error});
@@ -445,6 +446,7 @@ router.get('/login', function(req, res, next) {
 });
 
 router.post('/login', function(req, res, next) {
+  // ir buscar lista de admins
   if(req.body.username=="admin"){
     req.body.level = 1;
   }
