@@ -1,4 +1,6 @@
 # Projeto EW - I am ... (in bits and bytes) - O meu eu digital - Relatório
+## Avaliação
+Nota final: 17/20 ✅
 ## Descrição
 Este repositório foi criado para a Unidade Curricular de **Engenharia Web** (**EW**) e contém o projeto que desenvolvemos ao longo do segundo semestre do ano letivo de 2024/2025, no âmbito desta disciplina.
 
